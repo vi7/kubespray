@@ -6,5 +6,5 @@
     state: absent
 
 - name: Disable swap
-  command: swapoff -a
+  command: /usr/sbin/swapoff -a
   when: ansible_swaptotal_mb > 0

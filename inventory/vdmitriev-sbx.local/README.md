@@ -3,7 +3,7 @@ vdmitriev-sbx.local cluster notes
 
 **versions**
 
-kubespray - v2.8.1
+kubespray - v2.8.1 (fetched from this specific tag)
 
 **nodes**
 
@@ -43,13 +43,36 @@ Install pip and python3
     CONFIG_FILE=inventory/vdmitriev-sbx.local/hosts.ini python3 contrib/inventory_builder/inventory.py ${CLUSTER_IPS[@]}
     ```
 
-5. launch cluster
+5. Inventory hacks:
+    - change hostnames for the inventory (node1 etc.) to much the original hostnames of the VMs (see them above)
+    - add connection user: 
+        ```ini
+        [all:vars]
+        ansible_user=vdmitriev
+        ```
+
+5. "Disable swap" task is failing on CentOS 7 at [roles/kubernetes/preinstall/tasks/0010-swapoff.yml](./roles/kubernetes/preinstall/tasks/0010-swapoff.yml) cause `swapoff` command is in the /usr/sbin which is not a part of default PATH for ansible.
+
+    TODO: fix the role by adding the absolute path: `/usr/sbin/swapoff`
+
+6. launch cluster
 
     ```sh
     eval `ssh-agent -s`
     ssh-add /root/.ssh/vdmitriev
 
-    # create /home/vdmitriev and chown vdmitriev:engineering at all nodes for ansible to create tmp dir properly
+    # create /home/vdmitriev and chown vdmitriev:engineering at all nodes for ansible to create tmp dir properly OR:
+    export ANSIBLE_REMOTE_TMP="/tmp"
 
-    ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.ini cluster.yml -u vdmitriev -b -v
+    ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.ini cluster.yml -b -v
     ```
+
+TODO: FAILED on:
+
+    TASK [download : Download items] ************************************************************************************************************************************
+    Friday 18 January 2019  16:32:40 +0000 (0:00:00.055)       0:05:37.275 ******** 
+    fatal: [inw-vm41.rfiserve.net]: FAILED! => {"msg": "'dict object' has no attribute u'v1.13.2'"}
+    fatal: [inw-vm43.rfiserve.net]: FAILED! => {"msg": "'dict object' has no attribute u'v1.13.2'"}
+    fatal: [inw-vm52.rfiserve.net]: FAILED! => {"msg": "'dict object' has no attribute u'v1.13.2'"}
+    fatal: [inw-vm60.rfiserve.net]: FAILED! => {"msg": "'dict object' has no attribute u'v1.13.2'"}
+
