@@ -1,6 +1,13 @@
 vdmitriev-sbx.local cluster notes
 =================================
 
+---
+**WARNING**
+
+Stuff located in [this](./) dir is under the active development. README might not always depict the reality.
+
+---
+
 ### contents:
 
 - [versions](#versions)
@@ -9,12 +16,16 @@ vdmitriev-sbx.local cluster notes
 - [bootstrap cluster](#bootstrap-cluster)
 - [post-bootstrap steps](#post-bootstrap-steps)
 - [use cluster](#use-cluster)
+    - [configure kubectl](#configure-kubectl)
+    - [cluster admin service account](#cluster-admin-service-account)
     - [helm](#helm)
 
 ### versions
 
-- kubespray - v2.8.1 (fetched from the latest `release-2.8` branch)
+- kubespray - latest `release-2.8` branch
+- ansible - 2.7.5
 - kubernetes - v1.12.5
+- helm - v2.12.2
 
 ### nodes
 
@@ -35,7 +46,7 @@ Python above has been installed from the IUS repo, you can install it from the E
 
 Install [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
-Install [Helm](https://github.com/helm/helm/releases)
+Install [`Helm` client](https://github.com/helm/helm/releases)
 
 ### bootstrap cluster
 
@@ -51,14 +62,14 @@ Install [Helm](https://github.com/helm/helm/releases)
 
     The following has been overridden (that is vars not mentioned below left as is):
 
-    - [inventory/vdmitriev-sbx.local/group_vars/k8s-cluster/k8s-cluster.yml](./inventory/vdmitriev-sbx.local/group_vars/k8s-cluster/k8s-cluster.yml):
+    - [inventory/vdmitriev-sbx.local/group_vars/k8s-cluster/k8s-cluster.yml](../../inventory/vdmitriev-sbx.local/group_vars/k8s-cluster/k8s-cluster.yml):
 
             kube_version: v1.12.5
             kube_network_plugin: weave
             cluster_name: vdmitriev-sbx.local
             kubeconfig_localhost: true
     
-4. create Ansible inventory file using [inventory builder](./contrib/inventory_builder/inventory.py)
+4. create Ansible inventory file using [inventory builder](../../contrib/inventory_builder/inventory.py)
 
     > NOTE: IPs below are subject to change.
     
@@ -79,7 +90,7 @@ Install [Helm](https://github.com/helm/helm/releases)
         ansible_user=vdmitriev
         ```
 
-6. **BUG** - **FIXED** - "Disable swap" task is failing on CentOS 7 at [roles/kubernetes/preinstall/tasks/0010-swapoff.yml](./roles/kubernetes/preinstall/tasks/0010-swapoff.yml) cause `swapoff` bin is in the `/usr/sbin` dir which is not a part of the default PATH for ansible.
+6. **BUG** - **FIXED** - "Disable swap" task is failing on CentOS 7 at [roles/kubernetes/preinstall/tasks/0010-swapoff.yml](../../roles/kubernetes/preinstall/tasks/0010-swapoff.yml) cause `swapoff` bin is in the `/usr/sbin` dir which is not a part of the default PATH for ansible.
 
     Role fixed by adding the `/sbin:/usr/sbin` to the environment of the swapoff task
 
@@ -103,10 +114,10 @@ Install [Helm](https://github.com/helm/helm/releases)
 
 7. VMs hacks
 
-    - apply the playbook:
-        ```sh
-        ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.ini inventory/vdmitriev-sbx.local/scripts/prepare_host.yml -b
-        ```
+    Run the following:
+    ```sh
+    inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh prepare_host
+    ```
 
 8. launch cluster
 
@@ -144,13 +155,46 @@ More details on the available tags can be obtained [here](../../docs/ansible.md)
 
 ### use cluster
 
+#### configure kubectl
+
+Cluster kubeconfig with cluster admin access is generated as a part of bootstrap and placed to: [inventory/vdmitriev-sbx.local/artifacts/admin.conf](../../inventory/vdmitriev-sbx.local/artifacts/admin.conf)
+
+Cluster management is performed via `kubectl` utility which should be installed at the control machine. See [prerequisites](#prerequisites) above.
+
+Example:
+```sh
+export KUBECONFIG=<path-to-kubespray-repo>/inventory/vdmitriev-sbx.local/artifacts/admin.conf
+kubectl get nodes
+kubectl cluster-info
+```
+
+`kubectl` is also preconfigured at all cluster nodes
+
+> kubectl bash completion can be enabled by adding the following line to your .bashrc: `source <(kubectl completion bash)`
+
+#### cluster admin service account
+
+Subj service account is useful for sandboxing purposes (eg. accessing Kubernetes Dashboard). You should not normally create cluster admin service accounts for random purposes in production!
+
+Create account:
+```sh
+inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh cluster_admin_create
+```
+
+Get account token:
+```sh
+inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh cluster_admin_token
+```
+
 #### helm
 
-Install HELM
+You should have Helm client installed at your control machine to proceed. See [prerequisites](#prerequisites) above.
 
+> helm bash completion can be enabled by adding the following line to your .bashrc: `source <(helm completion bash)`
 
+Tiller, the server portion of Helm, should be installed the following way:
+```sh
+inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh tiller_deploy
 
-#### rbac
-
-TODO
+```
 
