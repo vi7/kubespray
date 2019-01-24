@@ -194,7 +194,7 @@ You should have Helm client installed at your control machine to proceed. See [p
 
 Tiller, the server portion of Helm, should be installed the following way:
 ```sh
-inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh tiller_deploy
+inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh helm_init
 
 ```
 
