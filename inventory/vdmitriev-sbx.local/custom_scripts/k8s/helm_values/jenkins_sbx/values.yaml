@@ -136,7 +136,8 @@ Master:
   # Node labels and tolerations for pod assignment
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#taints-and-tolerations-beta-feature
-  NodeSelector: {}
+  NodeSelector:
+    kubernetes.io/hostname: inw-vm52.rfiserve.net
   Tolerations: {}
   PodAnnotations: {}
 
@@ -183,7 +184,9 @@ Agent:
   # - type: Secret
   #   secretName: mysecret
   #   mountPath: /var/myapp/mysecret
-  NodeSelector: {}
+  NodeSelector:
+    kubernetes.io/hostname: inw-vm52.rfiserve.net
+    kubernetes.io/hostname: inw-vm60.rfiserve.net
   # Key Value selectors. Ex:
   # jenkins-agent: v1
 
@@ -192,7 +195,7 @@ Persistence:
   ## A manually managed Persistent Volume and Claim
   ## Requires Persistence.Enabled: true
   ## If defined, PVC must be created manually before volume will be bound
-  # ExistingClaim:
+  ExistingClaim: test-pvc
 
   ## jenkins data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
@@ -203,16 +206,16 @@ Persistence:
   ##
   # StorageClass: "-"
 
-  Annotations: {}
-  AccessMode: ReadWriteOnce
-  Size: 4Gi
-  volumes:
-  #  - name: nothing
-  #    emptyDir: {}
-  mounts:
-  #  - mountPath: /var/nothing
-  #    name: nothing
-  #    readOnly: true
+  # Annotations: {}
+  # AccessMode: ReadWriteOnce
+  # Size: 4Gi
+  # volumes:
+  # #  - name: nothing
+  # #    emptyDir: {}
+  # mounts:
+  # #  - mountPath: /var/nothing
+  # #    name: nothing
+  # #    readOnly: true
 
 NetworkPolicy:
   # Enable creation of NetworkPolicy resources.

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-deployment
+  labels:
+    app: test-depl-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-container-app
+  template:
+    metadata:
+      labels:
+        app: test-container-app
+    spec:
+      containers:
+      - name: test-container
+        image: busybox
+        command: ['sh']
+        stdin: true
+        tty: true
+        # volumeMounts:
+        #   - mountPath: /mnt/test_depl_data
+        #     name: test-depl-vol
+      nodeSelector:
+        kubernetes.io/hostname: inw-vm52.rfiserve.net
+      # volumes:
+      #   - name: test-depl-vol
+      #     persistentVolumeClaim:
+      #       claimName: test-depl-pvc
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: test-depl-pvc
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 250Mi
+#   # selector:
+#   #   matchLabels:
+#   #     release: "stable"
+#   volumeName: test-depl-pv

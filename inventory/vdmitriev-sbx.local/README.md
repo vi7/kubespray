@@ -8,7 +8,7 @@ Stuff located in [this](./) dir is under the active development. README might no
 
 ---
 
-### contents:
+### table of contents:
 
 - [versions](#versions)
 - [nodes](#nodes)
@@ -16,9 +16,11 @@ Stuff located in [this](./) dir is under the active development. README might no
 - [bootstrap cluster](#bootstrap-cluster)
 - [post-bootstrap steps](#post-bootstrap-steps)
 - [use cluster](#use-cluster)
-    - [configure kubectl](#configure-kubectl)
-    - [cluster admin service account](#cluster-admin-service-account)
-    - [helm](#helm)
+  * [configure kubectl](#configure-kubectl)
+  * [cluster admin service account](#cluster-admin-service-account)
+  * [helm](#helm)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 ### versions
 
