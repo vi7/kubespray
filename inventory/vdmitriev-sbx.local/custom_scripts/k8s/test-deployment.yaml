@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: test-container
-        image: busybox
+        image: alpine
         command: ['sh']
         stdin: true
         tty: true

@@ -46,7 +46,7 @@
     filename: "{{ kube_config_dir }}/{{ item.item.file }}"
     state: "latest"
   with_items:
-    # TODO: stuff below is failing for coredns dns_mode on not defined kubedns_manifests var. Should be fixed properly
+    # TODO: stuff below is failing for coredns dns_mode on not defined kubedns_manifests var (or vice a versa). Should be fixed properly
     # - "{{ kubedns_manifests.results | default({}) }}"
     - "{{ coredns_manifests.results | default({}) }}"
     - "{{ coredns_secondary_manifests.results | default({}) }}"
