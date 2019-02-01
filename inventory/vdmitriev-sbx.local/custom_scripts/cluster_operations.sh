@@ -5,6 +5,8 @@
 # MAINTAINERS:
 # Vitaliy Dmitriev
 
+set -e
+
 ########
 # VARS #
 ########
@@ -46,7 +48,7 @@ cluster_admin_token() {
 helm_init() {
   kubectl apply -f inventory/vdmitriev-sbx.local/custom_scripts/k8s/tiller-rbac-config.yaml
   # tiller service account and its permissions are configured by the command above
-  helm init --service-account tiller
+  helm init --service-account tiller --node-selectors=node-role.kubernetes.io/master=
 }
 
 jenkins_install() {

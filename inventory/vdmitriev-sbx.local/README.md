@@ -38,31 +38,40 @@ Stuff located in [this](./) dir is under the active development. README might no
 
 ### prerequisites
 
-Install `pip` and `python3` at the control machine
+The following should be performed at the _control machine_ (host which you will use to manage your k8s cluster configs and eventually spin up cluster itself).
+
+Cluster installation:
 
 1. install ius repo: `yum -y install https://centos7.iuscommunity.org/ius-release.rpm`
-2. `yum -y install python-pip python36u`
-3. `ln -s /usr/bin/python3.6 /usr/bin/python3`
+2. install pip and python3: `yum -y install python-pip python36u`
+3. install ansible: `pip install ansible==2.7.5`
+4. create link for python3: `ln -s /usr/bin/python3.6 /usr/bin/python3`
 
-Python above has been installed from the IUS repo, you can install it from the EPEL as well, but the version may be slightly older.
+> Python above has been installed from the IUS repo, you can install it from the EPEL as well, but the version may be slightly older.
+> 
+> Python 3 seems to be only needed by the ansible inv generation script (see [bootstrap cluster](#bootstrap-cluster) p.4), so if you will handle your [ansible inv](./hosts.ini) manually do not bother about Python 3
 
-Install [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+Cluster usage and management:
 
-Install [`Helm` client](https://github.com/helm/helm/releases)
+1. install [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+2. install [`Helm` client](https://github.com/helm/helm/releases)
 
 ### bootstrap cluster
 
-1. clone https://github.com/kubernetes-sigs/kubespray
+1. clone https://github.com/kubernetes-sigs/kubespray and create branch for your cluster configs
     - `git checkout release-2.8`
     - `git checkout -b vdmitriev_sbx`
-2. `pip install -r requirements.txt`
+
+2. install python packages required by the Kubespray
+    - `pip install -r requirements.txt`
+
 3. create cluster config and inventory from sample
     
     ```sh
     cp -rfp inventory/sample inventory/vdmitriev-sbx.local
     ```
 
-    The following has been overridden (that is vars not mentioned below left as is):
+    The following has been overridden for _this specific sandbox cluster_ (that is vars not mentioned below left as is):
 
     - [inventory/vdmitriev-sbx.local/group_vars/k8s-cluster/k8s-cluster.yml](../../inventory/vdmitriev-sbx.local/group_vars/k8s-cluster/k8s-cluster.yml):
 
@@ -114,28 +123,40 @@ Install [`Helm` client](https://github.com/helm/helm/releases)
 
     ------
 
-7. VMs hacks
+7. **BUG** - **WORKAROUND** - coredns (or kube-dns) addon installation is failing at the task "Kubernetes Apps | Start Resources" inside [roles/kubernetes-apps/ansible/tasks/main.yml](../../roles/kubernetes-apps/ansible/tasks/main.yml)
+
+    Reason:
+
+    default value for the `result` var will never be assigned when parent var is not defined thus causing the task to fail:
+    ```yaml
+    with_items:
+        - "{{ kubedns_manifests.results | default({}) }}"
+        - "{{ coredns_manifests.results | default({}) }}"
+        - "{{ coredns_secondary_manifests.results | default({}) }}"
+    ```
+
+8. VMs hacks
 
     Run the following:
     ```sh
+    # override ansible remote tmp dir to avoid it failing because of the absent home dir of the user you use to ssh to the nodes
+    export ANSIBLE_REMOTE_TMP="/tmp"
     inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh prepare_host
     ```
 
-8. launch cluster
+    Refer to the script above to get the details.
+
+9. launch cluster
 
     - add VMs ssh key to the ssh agent:
         ```sh
         eval `ssh-agent -s`
         ssh-add /root/.ssh/vdmitriev
-        ```
-
-    - create /home/vdmitriev and chown vdmitriev:engineering at all nodes for ansible to create tmp dir properly OR:
-        ```sh
-        export ANSIBLE_REMOTE_TMP="/tmp"
-        ```
 
     - run playbook:
         ```sh
+        # override ansible remote tmp dir to avoid it failing because of the absent home dir of the user you use to ssh to the nodes
+        export ANSIBLE_REMOTE_TMP="/tmp"
         ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.ini cluster.yml -b -v
         ```
 
@@ -153,7 +174,7 @@ There is a possibility to trigger separate steps of the Kubespray. This is achie
     ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.ini cluster.yml -b -v -t weave
     ```
 
-More details on the available tags can be obtained [here](../../docs/ansible.md)
+Details on the available tags can be obtained [here](../../docs/ansible.md)
 
 ### use cluster
 
@@ -165,7 +186,7 @@ Cluster management is performed via `kubectl` utility which should be installed 
 
 Example:
 ```sh
-export KUBECONFIG=<path-to-kubespray-repo>/inventory/vdmitriev-sbx.local/artifacts/admin.conf
+export KUBECONFIG=<path-to-kubespray-repo>/inventory/<cluster-name>/artifacts/admin.conf
 kubectl get nodes
 kubectl cluster-info
 ```

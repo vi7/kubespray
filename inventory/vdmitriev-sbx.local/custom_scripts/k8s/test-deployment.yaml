@@ -23,8 +23,8 @@ spec:
         # volumeMounts:
         #   - mountPath: /mnt/test_depl_data
         #     name: test-depl-vol
-      nodeSelector:
-        kubernetes.io/hostname: inw-vm52.rfiserve.net
+      # nodeSelector:
+      #   kubernetes.io/hostname: inw-vm60.rfiserve.net
       # volumes:
       #   - name: test-depl-vol
       #     persistentVolumeClaim:

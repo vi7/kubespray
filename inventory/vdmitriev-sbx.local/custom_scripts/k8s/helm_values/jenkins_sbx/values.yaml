@@ -11,7 +11,7 @@ nameOverride: jenkins-sbx
 Master:
   Name: jenkins-master
   Image: "jenkins/jenkins"
-  ImageTag: "2.161"
+  ImageTag: "2.162"
   ImagePullPolicy: "Always"
 # ImagePullSecret: jenkins
   Component: "jenkins-master"
@@ -105,11 +105,12 @@ Master:
   #   port: 9000
   # List of plugins to be install during Jenkins master start
   InstallPlugins:
-    - kubernetes:1.14.0
+    - kubernetes:1.14.3
     - workflow-job:2.31
     - workflow-aggregator:2.6
     - credentials-binding:1.17
     - git:3.9.1
+    - greenballs:1.15
   # Used to approve a list of groovy functions in pipelines used the script-security plugin. Can be viewed under /scriptApproval
   # ScriptApproval:
   #   - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
