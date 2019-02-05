@@ -20,15 +20,15 @@ spec:
         command: ['sh']
         stdin: true
         tty: true
-        # volumeMounts:
-        #   - mountPath: /mnt/test_depl_data
-        #     name: test-depl-vol
+        volumeMounts:
+          - mountPath: /mnt/test_depl_data
+            name: test-depl-vol
       # nodeSelector:
       #   kubernetes.io/hostname: inw-vm60.rfiserve.net
-      # volumes:
-      #   - name: test-depl-vol
-      #     persistentVolumeClaim:
-      #       claimName: test-depl-pvc
+      volumes:
+        - name: test-depl-vol
+          persistentVolumeClaim:
+            claimName: perms-pvc
 # ---
 # apiVersion: v1
 # kind: PersistentVolumeClaim

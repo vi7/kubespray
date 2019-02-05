@@ -221,3 +221,8 @@ inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh helm_init
 
 ```
 
+To remove tiller from your cluster do the following:
+```sh
+inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh helm_kill
+
+```
