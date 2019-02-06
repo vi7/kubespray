@@ -11,7 +11,7 @@ Stuff located in [this](./) dir is under the active development. README might no
 ### table of contents:
 
 - [versions](#versions)
-- [nodes](#nodes)
+- [cluster topology](#cluster-topology)
 - [prerequisites](#prerequisites)
 - [bootstrap cluster](#bootstrap-cluster)
 - [post-bootstrap steps](#post-bootstrap-steps)
@@ -19,6 +19,7 @@ Stuff located in [this](./) dir is under the active development. README might no
   * [configure kubectl](#configure-kubectl)
   * [cluster admin service account](#cluster-admin-service-account)
   * [helm](#helm)
+- [known issues](#known-issues)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -29,12 +30,9 @@ Stuff located in [this](./) dir is under the active development. README might no
 - kubernetes - v1.12.5
 - helm - v2.12.2
 
-### nodes
+### cluster topology
 
-- k8s node1: inw-vm41.rfiserve.net (172.22.4.217)
-- k8s node2: inw-vm43.rfiserve.net (172.22.4.58)
-- k8s node3: inw-vm52.rfiserve.net (172.22.4.59)
-- k8s node4: inw-vm60.rfiserve.net (172.22.4.60)
+check [hosts.ini](./hosts.ini) for the up-to-date cluster topology
 
 ### prerequisites
 
@@ -89,92 +87,35 @@ Cluster usage and management:
     ! DO NOT RUN THAT IF YOU CHANGED INVENTORY FILE MANUALLY BECAUSE IT'LL SCREW UP ALL YOU CHANGES !
 
     ```sh
-    declare -a CLUSTER_IPS=(172.22.4.217 172.22.4.58 172.22.4.59 172.22.4.60)
+    declare -a CLUSTER_IPS=(172.22.4.217 172.22.4.58 172.22.4.50 172.22.4.59 172.22.4.60)
     CONFIG_FILE=inventory/vdmitriev-sbx.local/hosts.ini python3 contrib/inventory_builder/inventory.py ${CLUSTER_IPS[@]}
     ```
 
 5. inventory hacks
     - change hostnames for the inventory (node1 etc.) to much the original hostnames of the VMs (see them above)
-    - add connection user so you won't need to each time pass it to the ansible commands: 
+    - add ssh connection user so you won't need to each time pass it to the ansible commands: 
         ```ini
         [all:vars]
-        ansible_user=vdmitriev
+        ansible_user=<ssh_username>
         ```
 
-6. **BUG** - **FIXED** - "Disable swap" task is failing on CentOS 7 at [roles/kubernetes/preinstall/tasks/0010-swapoff.yml](../../roles/kubernetes/preinstall/tasks/0010-swapoff.yml) cause `swapoff` bin is in the `/usr/sbin` dir which is not a part of the default PATH for ansible.
+    It's also recommended to not use the same hosts for master and worker nodes at the same time. That is your inventory groups `[kube-master]` and `[kube-node]` should not intersect
 
-    Role fixed by adding the `/sbin:/usr/sbin` to the environment of the swapoff task
-
-    ------
-
-    TODO: submit PR to the kubespray. Default ansible PATH for CentOS 7 which is not including "sbin" dirs:
-
-    ```sh
-    ansible all -i 10.0.2.15, --private-key private_key -u vagrant -a 'echo $PATH'
-    
-    10.0.2.15 | CHANGED | rc=0 >>
-    /usr/local/bin:/usr/bin
-
-    ansible all -i 10.0.2.15, --private-key private_key -u vagrant -m shell -a 'echo $PATH'
-    
-    10.0.2.15 | CHANGED | rc=0 >>
-    /usr/local/bin:/usr/bin
-    ```
-
-    ------
-
-7. **BUG** - **WORKAROUND** - coredns (or kube-dns) addon installation is failing at the task "Kubernetes Apps | Start Resources" inside [roles/kubernetes-apps/ansible/tasks/main.yml](../../roles/kubernetes-apps/ansible/tasks/main.yml)
-
-    Reason:
-
-    default value for the `result` var will never be assigned when parent var is not defined thus causing the task to fail:
-    ```yaml
-    with_items:
-        - "{{ kubedns_manifests.results | default({}) }}"
-        - "{{ coredns_manifests.results | default({}) }}"
-        - "{{ coredns_secondary_manifests.results | default({}) }}"
-    ```
-
-8. VMs hacks
-
-    Run the following:
-    ```sh
-    # override ansible remote tmp dir to avoid it failing because of the absent home dir of the user you use to ssh to the nodes
-    export ANSIBLE_REMOTE_TMP="/tmp"
-    inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh prepare_host
-    ```
-
-    Refer to the script above to get the details.
-
-9. launch cluster
+6. launch cluster
 
     - add VMs ssh key to the ssh agent:
         ```sh
         eval `ssh-agent -s`
-        ssh-add /root/.ssh/vdmitriev
+        ssh-add <path/to/your/ssh_key>
 
-    - run playbook:
+    - run cluster.yml playbook:
         ```sh
-        # override ansible remote tmp dir to avoid it failing because of the absent home dir of the user you use to ssh to the nodes
-        export ANSIBLE_REMOTE_TMP="/tmp"
-        ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.ini cluster.yml -b -v
+        inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh start_cluster
         ```
 
 ### post-bootstrap steps
 
-There is a possibility to trigger separate steps of the Kubespray. This is achieved by passing specific tags to Ansible. For example if you need:
-
-- to run K8S dashboard installation:
-    ```sh
-    ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.ini cluster.yml -b -v -t dashboard
-    ```
-
-- to run weave networking installation:
-    ```sh
-    ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.ini cluster.yml -b -v -t weave
-    ```
-
-Details on the available tags can be obtained [here](../../docs/ansible.md)
+There is a possibility to trigger separate steps of the Kubespray. This is achieved by passing specific tags to Ansible. Details on the available tags can be obtained [here](../../docs/ansible.md)
 
 ### use cluster
 
@@ -226,3 +167,40 @@ To remove tiller from your cluster do the following:
 inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh helm_kill
 
 ```
+
+### known issues
+
+1. **BUG** - **FIXED** - "Disable swap" task is failing on CentOS 7 at [roles/kubernetes/preinstall/tasks/0010-swapoff.yml](../../roles/kubernetes/preinstall/tasks/0010-swapoff.yml) cause `swapoff` bin is in the `/usr/sbin` dir which is not a part of the default PATH for ansible.
+
+    Role fixed by adding the `/sbin:/usr/sbin` to the environment of the swapoff task
+
+    ------
+
+    TODO: submit PR to the kubespray. Default ansible PATH for CentOS 7 which is not including "sbin" dirs:
+
+    ```sh
+    ansible all -i 10.0.2.15, --private-key private_key -u vagrant -a 'echo $PATH'
+    
+    10.0.2.15 | CHANGED | rc=0 >>
+    /usr/local/bin:/usr/bin
+
+    ansible all -i 10.0.2.15, --private-key private_key -u vagrant -m shell -a 'echo $PATH'
+    
+    10.0.2.15 | CHANGED | rc=0 >>
+    /usr/local/bin:/usr/bin
+    ```
+
+    ------
+
+2. **BUG** - **WORKAROUND** - coredns (or kube-dns) addon installation is failing at the task "Kubernetes Apps | Start Resources" inside [roles/kubernetes-apps/ansible/tasks/main.yml](../../roles/kubernetes-apps/ansible/tasks/main.yml)
+
+    Reason:
+
+    default value for the `result` var will never be assigned when parent var is not defined thus causing the task to fail:
+    ```yaml
+    with_items:
+        - "{{ kubedns_manifests.results | default({}) }}"
+        - "{{ coredns_manifests.results | default({}) }}"
+        - "{{ coredns_secondary_manifests.results | default({}) }}"
+    ```
+

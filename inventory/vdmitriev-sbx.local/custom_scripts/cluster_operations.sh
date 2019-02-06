@@ -11,6 +11,8 @@ set -e
 # VARS #
 ########
 
+CLUSTER_NAME="vdmitriev-sbx.local"
+
 JENKINS_CHART_VER="0.28.9"
 JENKINS_RELEASE_NAME="jenkins-sbx"
 
@@ -22,6 +24,9 @@ help() {
   echo "
 Script should be launched from the kubespray repo root.
 
+`basename $0` start_cluster - launch cluster from scratch or update config of the existing one (e.g. adding masters or etcd nodes)
+`basename $0` add_node - add worker node to the cluster
+`basename $0` remove_node <node list> - remove worker node from the cluster, <node list> - comma-separated list of node names
 `basename $0` prepare_host - run hacks required to prepare VMs for K8S
 `basename $0` cluster_admin_create - create cluster admin service account
 `basename $0` cluster_admin_token - get cluster admin token
@@ -32,12 +37,47 @@ Script should be launched from the kubespray repo root.
   "
 }
 
+start_cluster() {
+  export ANSIBLE_REMOTE_TMP="/tmp"
+
+  pip install -r requirements.txt
+  prepare_host
+  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.ini cluster.yml -b -v
+}
+
+add_node() {
+  export ANSIBLE_REMOTE_TMP="/tmp"
+
+  prepare_host
+  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.ini scale.yml -b -v
+}
+
+# params:
+# $1 - comma-separated list of node names to remove
+remove_node() {
+  export ANSIBLE_REMOTE_TMP="/tmp"
+
+  if [ "x$1" == "x" ]
+  then
+    echo "[ERROR] node list is empty. Please provide comma-separated list of the node names to remove" >&2
+    exit 1
+  fi
+
+  echo "[WARN] The following nodes will be removed: $1"
+
+  prepare_host
+  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.ini remove-node.yml -b -v \
+  --extra-vars "node=$1"
+}
+
 prepare_host() {
-  ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.ini inventory/vdmitriev-sbx.local/custom_scripts/prepare_host.yml -b
+  export ANSIBLE_REMOTE_TMP="/tmp"
+
+  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.ini inventory/$CLUSTER_NAME/custom_scripts/prepare_host.yml -b
 }
 
 cluster_admin_create() {
-  kubectl apply -f inventory/vdmitriev-sbx.local/custom_scripts/k8s/cluster-admin-user.yaml 
+  kubectl apply -f inventory/$CLUSTER_NAME/custom_scripts/k8s/cluster-admin-user.yaml 
 }
 
 cluster_admin_token() {
@@ -48,7 +88,7 @@ cluster_admin_token() {
 
 helm_init() {
   # tiller service account and permissions
-  kubectl apply -f inventory/vdmitriev-sbx.local/custom_scripts/k8s/tiller-rbac-config.yaml
+  kubectl apply -f inventory/$CLUSTER_NAME/custom_scripts/k8s/tiller-rbac-config.yaml
 
   # tiller.installation with selector and NoSchedule toleration for master nodes, all other tolerations are helm defaults needed for a proper override
   helm init --service-account tiller \
@@ -67,11 +107,11 @@ helm_init() {
 
 helm_kill() {
   kubectl -n kube-system delete deploy -l name=tiller
-  kubectl delete -f inventory/vdmitriev-sbx.local/custom_scripts/k8s/tiller-rbac-config.yaml
+  kubectl delete -f inventory/$CLUSTER_NAME/custom_scripts/k8s/tiller-rbac-config.yaml
 }
 
 jenkins_install() {
-  helm install -n $JENKINS_RELEASE_NAME -f inventory/vdmitriev-sbx.local/custom_scripts/k8s/helm_values/jenkins_sbx/values.yaml --version $JENKINS_CHART_VER stable/jenkins
+  helm install -n $JENKINS_RELEASE_NAME -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/jenkins_sbx/values.yaml --version $JENKINS_CHART_VER stable/jenkins
 
   echo "=============================================="
   echo "[!!! IMPORTANT !!!] User with id 1000 should have full access to the the volume you provided for jenkins home mount point"
@@ -79,7 +119,7 @@ jenkins_install() {
 }
 
 jenkins_upgrade() {
-  helm upgrade -f inventory/vdmitriev-sbx.local/custom_scripts/k8s/helm_values/jenkins_sbx/values.yaml --version $JENKINS_CHART_VER $JENKINS_RELEASE_NAME stable/jenkins
+  helm upgrade -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/jenkins_sbx/values.yaml --version $JENKINS_CHART_VER $JENKINS_RELEASE_NAME stable/jenkins
 }
 
 ########
@@ -92,4 +132,4 @@ then
   exit 1
 fi
 
-$1
+$1 $2

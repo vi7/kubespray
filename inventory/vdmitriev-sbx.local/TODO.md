@@ -29,7 +29,7 @@ TODO list
         kubernetes-apps/network_plugin/weave : Weave | Wait for Weave to become available -------------- 8.34s
         etcd : wait for etcd up ------------------------------------------------------------------------ 8.29s
 
-  from the inw-vm21.rfiserve.net VM:
+  from the inw-vm21.rfiserve.net VM (2 masters, 2 nodes):
 
         Monday 04 February 2019  10:36:19 -0500 (0:00:00.111)       0:15:04.531 *******
         ===============================================================================
@@ -54,10 +54,33 @@ TODO list
         etcd : Gen_certs | Gather etcd master certs ----------------------------------------------------------------- 5.83s
         kubernetes-apps/network_plugin/weave : Weave | Wait for Weave to become available --------------------------- 5.73s
 
-3. Add permissions for jenkins volume (1000:1000)
-4. Add pod tolerations for proper tiller deployment at master:
-```yaml
-tolerations:
-  - effect: NoSchedule
-    key: node-role.kubernetes.io/master
-```
+from the inw-vm21.rfiserve.net VM (3 masters, 2 nodes):
+
+        Thursday 07 February 2019  09:51:50 -0500 (0:00:00.244)       0:20:06.401 ***** 
+        =============================================================================== 
+        kubernetes/master : kubeadm | Initialize first master ------------------------------------------------------ 58.41s
+        kubernetes/master : kubeadm | Init other uninitialized masters --------------------------------------------- 47.24s
+        container-engine/docker : ensure docker packages are installed --------------------------------------------- 41.05s
+        kubernetes/master : Master | reload kubelet ---------------------------------------------------------------- 39.88s
+        gather facts from all instances ---------------------------------------------------------------------------- 28.27s
+        download : file_download | Download item ------------------------------------------------------------------- 18.12s
+        kubernetes/preinstall : Update package management cache (YUM) ---------------------------------------------- 17.57s
+        kubernetes/kubeadm : Restart all kube-proxy pods to ensure that they load the new configmap ---------------- 14.44s
+        etcd : Gen_certs | Write etcd master certs ----------------------------------------------------------------- 13.98s
+        download : file_download | Download item ------------------------------------------------------------------- 11.93s
+        etcd : reload etcd ----------------------------------------------------------------------------------------- 11.27s
+        container-engine/docker : Docker | pause while Docker restarts --------------------------------------------- 10.18s
+        container-engine/docker : Ensure old versions of Docker are not installed. | RedHat ------------------------- 9.77s
+        download : Download items ----------------------------------------------------------------------------------- 9.77s
+        kubernetes/preinstall : Hosts | populate inventory into hosts file ------------------------------------------ 9.63s
+        kubernetes/preinstall : Install packages requirements ------------------------------------------------------- 8.82s
+        download : container_download | Download containers if pull is required or told to always pull (all nodes) -- 8.12s
+        download : Sync container ----------------------------------------------------------------------------------- 7.63s
+        etcd : wait for etcd up ------------------------------------------------------------------------------------- 7.31s
+        etcd : Gen_certs | Gather etcd master certs ----------------------------------------------------------------- 7.26s
+
+3. Automatically add permissions for jenkins volume (1000:1000)
+4. Implement proper master scaling (up and down) and nodes replacement
+5. Implement proper etcd scaling (up and down) and nodes replacement
+6. Migrate [hosts.ini](./hosts.ini) inventory to yaml format
+7. Migrate [custom_scripts/prepare_host.yml](./custom_scripts/prepare_host.yml) to a separate ansible role
