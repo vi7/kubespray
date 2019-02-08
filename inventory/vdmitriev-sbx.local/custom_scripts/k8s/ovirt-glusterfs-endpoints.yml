@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: ovirt-glusterfs
+subsets:
+- addresses:
+  # inw-1216.rfiserve.net
+  - ip: 172.22.4.17
+  # inw-1217.rfiserve.net
+  - ip: 172.22.4.20
+  # inw-1218.rfiserve.net
+  - ip: 172.22.4.22
+  ports:
+  - port: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ovirt-glusterfs
+spec:
+  ports:
+  - port: 1

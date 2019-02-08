@@ -19,9 +19,11 @@ Stuff located in [this](./) dir is under the active development. README might no
   * [configure kubectl](#configure-kubectl)
   * [cluster admin service account](#cluster-admin-service-account)
   * [helm](#helm)
+  * [glusterfs](#glusterfs)
 - [known issues](#known-issues)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 ### versions
 
@@ -30,9 +32,11 @@ Stuff located in [this](./) dir is under the active development. README might no
 - kubernetes - v1.12.5
 - helm - v2.12.2
 
+
 ### cluster topology
 
 check [hosts.ini](./hosts.ini) for the up-to-date cluster topology
+
 
 ### prerequisites
 
@@ -53,6 +57,7 @@ Cluster usage and management:
 
 1. install [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 2. install [`Helm` client](https://github.com/helm/helm/releases)
+
 
 ### bootstrap cluster
 
@@ -107,15 +112,18 @@ Cluster usage and management:
         ```sh
         eval `ssh-agent -s`
         ssh-add <path/to/your/ssh_key>
+        ```
 
-    - run cluster.yml playbook:
+    - run the following ([cluster.yml](../../cluster.yml) playbook wrapper with some additional hacks - check the script for the details):
         ```sh
         inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh start_cluster
         ```
 
+
 ### post-bootstrap steps
 
 There is a possibility to trigger separate steps of the Kubespray. This is achieved by passing specific tags to Ansible. Details on the available tags can be obtained [here](../../docs/ansible.md)
+
 
 ### use cluster
 
@@ -168,6 +176,43 @@ inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh helm_kill
 
 ```
 
+#### glusterfs
+
+Usage options:
+
+1. Standalone GlusterFS cluster (oVirt based `k8s` glusterfs volume for this PoC). Create endpoints and service (for endpoints persistence between k8s reboots)
+    ```sh
+    kubectl apply -f inventory/vdmitriev-sbx.local/custom_scripts/k8s/ovirt-glusterfs-endpoints.yml
+    ```
+
+    Container spec example:
+    ```yaml
+    ...
+    spec:
+      containers:
+      - name: test-container
+        image: alpine
+        command: ['sh']
+        stdin: true
+        tty: true
+        volumeMounts:
+          - mountPath: /mnt/test_depl_data
+            name: test-depl-vol
+      volumes:
+        - name: test-depl-vol
+          glusterfs:
+            endpoints: ovirt-glusterfs
+            path: k8s
+    ...
+    ```
+
+    **Cons:**
+
+    - volumes should be managed by some mechanism outside of a cluster which makes procedure of volume claiming complex (i.e. not fully controlled by the K8S cluster)
+
+2. GlusterFS deployed into the K8S cluster and managed by Heketi. Check here for the details: [contrib/network-storage/heketi/](../../contrib/network-storage/heketi/)
+
+
 ### known issues
 
 1. **BUG** - **FIXED** - "Disable swap" task is failing on CentOS 7 at [roles/kubernetes/preinstall/tasks/0010-swapoff.yml](../../roles/kubernetes/preinstall/tasks/0010-swapoff.yml) cause `swapoff` bin is in the `/usr/sbin` dir which is not a part of the default PATH for ansible.
@@ -203,4 +248,6 @@ inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh helm_kill
         - "{{ coredns_manifests.results | default({}) }}"
         - "{{ coredns_secondary_manifests.results | default({}) }}"
     ```
+
+    TODO: try setting `kubedns_manifests: {}` at the k8s-cluster.yml to fix the issue without code changes
 

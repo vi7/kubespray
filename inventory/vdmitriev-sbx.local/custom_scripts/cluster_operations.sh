@@ -77,7 +77,7 @@ prepare_host() {
 }
 
 cluster_admin_create() {
-  kubectl apply -f inventory/$CLUSTER_NAME/custom_scripts/k8s/cluster-admin-user.yaml 
+  kubectl apply -f inventory/$CLUSTER_NAME/custom_scripts/k8s/cluster-admin-user.yml 
 }
 
 cluster_admin_token() {
@@ -88,7 +88,7 @@ cluster_admin_token() {
 
 helm_init() {
   # tiller service account and permissions
-  kubectl apply -f inventory/$CLUSTER_NAME/custom_scripts/k8s/tiller-rbac-config.yaml
+  kubectl apply -f inventory/$CLUSTER_NAME/custom_scripts/k8s/tiller-rbac-config.yml
 
   # tiller.installation with selector and NoSchedule toleration for master nodes, all other tolerations are helm defaults needed for a proper override
   helm init --service-account tiller \
@@ -107,11 +107,11 @@ helm_init() {
 
 helm_kill() {
   kubectl -n kube-system delete deploy -l name=tiller
-  kubectl delete -f inventory/$CLUSTER_NAME/custom_scripts/k8s/tiller-rbac-config.yaml
+  kubectl delete -f inventory/$CLUSTER_NAME/custom_scripts/k8s/tiller-rbac-config.yml
 }
 
 jenkins_install() {
-  helm install -n $JENKINS_RELEASE_NAME -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/jenkins_sbx/values.yaml --version $JENKINS_CHART_VER stable/jenkins
+  helm install -n $JENKINS_RELEASE_NAME -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/jenkins_sbx/values.yml --version $JENKINS_CHART_VER stable/jenkins
 
   echo "=============================================="
   echo "[!!! IMPORTANT !!!] User with id 1000 should have full access to the the volume you provided for jenkins home mount point"
@@ -119,7 +119,7 @@ jenkins_install() {
 }
 
 jenkins_upgrade() {
-  helm upgrade -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/jenkins_sbx/values.yaml --version $JENKINS_CHART_VER $JENKINS_RELEASE_NAME stable/jenkins
+  helm upgrade -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/jenkins_sbx/values.yml --version $JENKINS_CHART_VER $JENKINS_RELEASE_NAME stable/jenkins
 }
 
 ########
