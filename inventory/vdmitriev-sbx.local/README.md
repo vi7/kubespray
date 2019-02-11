@@ -35,7 +35,7 @@ Stuff located in [this](./) dir is under the active development. README might no
 
 ### cluster topology
 
-check [hosts.ini](./hosts.ini) for the up-to-date cluster topology
+check [hosts.yml](./hosts.yml) for the up-to-date cluster topology
 
 
 ### prerequisites
@@ -51,7 +51,7 @@ Cluster installation:
 
 > Python above has been installed from the IUS repo, you can install it from the EPEL as well, but the version may be slightly older.
 > 
-> Python 3 seems to be only needed by the ansible inv generation script (see [bootstrap cluster](#bootstrap-cluster) p.4), so if you will handle your [ansible inv](./hosts.ini) manually do not bother about Python 3
+> Python 3 seems to be only needed by the ansible inv generation script (see [bootstrap cluster](#bootstrap-cluster) p.4), so if you will handle your [ansible inv](./hosts.yml) manually do not bother about Python 3
 
 Cluster usage and management:
 
@@ -87,7 +87,7 @@ Cluster usage and management:
 
     > NOTE: IPs below are subject to change.
     
-    > By default hostnames of the hosts will be changed to `node[1..n]`. See step 5.
+    > Kubespray will change hostnames of all your hosts to `node[1..n]`. To avoid that see step 5.
     
     ! DO NOT RUN THAT IF YOU CHANGED INVENTORY FILE MANUALLY BECAUSE IT'LL SCREW UP ALL YOU CHANGES !
 
@@ -97,11 +97,13 @@ Cluster usage and management:
     ```
 
 5. inventory hacks
-    - change hostnames for the inventory (node1 etc.) to much the original hostnames of the VMs (see them above)
+    - migrate inventory to the yaml format
+    - change hostnames for the inventory (node1 etc.) to much the original hostnames of the VMs
     - add ssh connection user so you won't need to each time pass it to the ansible commands: 
-        ```ini
-        [all:vars]
-        ansible_user=<ssh_username>
+        ```yaml
+        all:
+          vars:
+            ansible_user: vdmitriev
         ```
 
     It's also recommended to not use the same hosts for master and worker nodes at the same time. That is your inventory groups `[kube-master]` and `[kube-node]` should not intersect
@@ -211,6 +213,18 @@ Usage options:
     - volumes should be managed by some mechanism outside of a cluster which makes procedure of volume claiming complex (i.e. not fully controlled by the K8S cluster)
 
 2. GlusterFS deployed into the K8S cluster and managed by Heketi. Check here for the details: [contrib/network-storage/heketi/](../../contrib/network-storage/heketi/)
+
+    Steps:
+
+    - install jmespath
+        ```sh
+        pip install jmespath
+        ```
+
+    - run heketi playbook
+        ```sh
+        ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.yml contrib/network-storage/heketi/heketi.yml -b -v
+        ```
 
 
 ### known issues

@@ -82,5 +82,5 @@ from the inw-vm21.rfiserve.net VM (3 masters, 2 nodes):
 3. Automatically add permissions for jenkins volume (1000:1000)
 4. Implement proper master scaling (up and down) and nodes replacement
 5. Implement proper etcd scaling (up and down) and nodes replacement
-6. Migrate [hosts.ini](./hosts.ini) inventory to yaml format
-7. Migrate [custom_scripts/prepare_host.yml](./custom_scripts/prepare_host.yml) to a separate ansible role
+6. Migrate [custom_scripts/prepare_host.yml](./custom_scripts/prepare_host.yml) to a separate ansible role
+7. GlusterFS/heketi provision logic **should be re-written from scratch** in case in-cluster glusterfs-heketi will be used for persistency.

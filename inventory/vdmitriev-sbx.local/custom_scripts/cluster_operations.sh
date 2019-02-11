@@ -42,14 +42,14 @@ start_cluster() {
 
   pip install -r requirements.txt
   prepare_host
-  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.ini cluster.yml -b -v
+  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.yml cluster.yml -b -v
 }
 
 add_node() {
   export ANSIBLE_REMOTE_TMP="/tmp"
 
   prepare_host
-  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.ini scale.yml -b -v
+  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.yml scale.yml -b -v
 }
 
 # params:
@@ -66,14 +66,14 @@ remove_node() {
   echo "[WARN] The following nodes will be removed: $1"
 
   prepare_host
-  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.ini remove-node.yml -b -v \
+  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.yml remove-node.yml -b -v \
   --extra-vars "node=$1"
 }
 
 prepare_host() {
   export ANSIBLE_REMOTE_TMP="/tmp"
 
-  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.ini inventory/$CLUSTER_NAME/custom_scripts/prepare_host.yml -b
+  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.yml inventory/$CLUSTER_NAME/custom_scripts/prepare_host.yml -b
 }
 
 cluster_admin_create() {
