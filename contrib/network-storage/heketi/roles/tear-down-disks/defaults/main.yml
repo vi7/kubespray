@@ -1,0 +1,3 @@
+---
+# automatic cleanup of LVM packages during GlusterFS/Heketi tear down
+cleanup_lvm_utils: false
