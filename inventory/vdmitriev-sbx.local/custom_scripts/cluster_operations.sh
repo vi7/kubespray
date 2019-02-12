@@ -30,6 +30,7 @@ Script should be launched from the kubespray repo root.
 `basename $0` prepare_host - run hacks required to prepare VMs for K8S
 `basename $0` cluster_admin_create - create cluster admin service account
 `basename $0` cluster_admin_token - get cluster admin token
+`basename $0` anonymous_service_access - create cluster role which enables anonymous access to the k8s service endpoints via API
 `basename $0` helm_init - create tiller service account and deploy tiller into the cluster
 `basename $0` helm_kill - remove tiller service account and tiller from the cluster
 `basename $0` jenkins_install - install jenkins chart into the cluster
@@ -77,13 +78,17 @@ prepare_host() {
 }
 
 cluster_admin_create() {
-  kubectl apply -f inventory/$CLUSTER_NAME/custom_scripts/k8s/cluster-admin-user.yml 
+  kubectl apply -f inventory/$CLUSTER_NAME/custom_scripts/k8s/cluster-admin-user.yml
 }
 
 cluster_admin_token() {
   echo "=============================================="
   kubectl -n kube-system get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='cluster-admin-user')].data.token}" | base64 -d
   echo -e "\n=============================================="
+}
+
+anonymous_service_access() {
+  kubectl apply -f inventory/$CLUSTER_NAME/custom_scripts/k8s/cluster-anonymous-service-proxy-rbac.yml
 }
 
 helm_init() {

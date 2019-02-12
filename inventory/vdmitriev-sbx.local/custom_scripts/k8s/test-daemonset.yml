@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: test-daemonset
+  # namespace: kube-system
+  labels:
+    k8s-app: test-ds-app
+spec:
+  selector:
+    matchLabels:
+      app: test-ds-pod
+  template:
+    metadata:
+      labels:
+        app: test-ds-pod
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      containers:
+      - name: test-ds-container
+        image: containous/whoami
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+      terminationGracePeriodSeconds: 30
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: test-service
+spec:
+  selector:
+    app: test-ds-pod
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8080
+    targetPort: 80
+      
