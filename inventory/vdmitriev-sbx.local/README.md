@@ -21,6 +21,8 @@ Stuff located in [this](./) dir is under the active development. README might no
   * [helm](#helm)
   * [glusterfs](#glusterfs)
 - [known issues](#known-issues)
+  * [kubespray](#kubespray)
+  * [heketi glusterfs](#heketi-glusterfs)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -208,13 +210,18 @@ Usage options:
     ...
     ```
 
-    **Cons:**
+    **SUMMARY**
 
-    - volumes should be managed by some mechanism outside of a cluster which makes procedure of volume claiming complex (i.e. not fully controlled by the K8S cluster)
+    Cons:
+
+    - volumes should be managed by some mechanism outside of a K8S cluster which makes procedure of volume claiming complex (i.e. not fully controlled by the K8S cluster)
+
+
+    TODO: try volume management with Heketi, thus allowing external GlusterFS being managed by K8S
 
 2. GlusterFS deployed into the K8S cluster and managed by Heketi. Check here for the details: [contrib/network-storage/heketi/](../../contrib/network-storage/heketi/)
 
-    Deploy:
+    **Deploy**
 
     - 3 nodes required
 
@@ -226,14 +233,30 @@ Usage options:
     - run heketi playbook
         ```sh
         export ANSIBLE_REMOTE_TMP="/tmp"
-        ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.yml contrib/network-storage/heketi/heketi.yml -b -v
+        ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.yml contrib/network-storage/heketi/heketi.yml -b -vv
         ```
 
-    **Cons:**
+    **Tear down**
 
-    - high complexity of the official GlusterFS docker image: https://hub.docker.com/r/gluster/gluster-centos/dockerfile, meaning that it might be easier to manage a standalone (outside of K8S) GlusterFS cluster
+    - run tear down playbook
+        ```sh
+        export ANSIBLE_REMOTE_TMP="/tmp"
+        ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.yml contrib/network-storage/heketi/heketi-tear-down.yml -b -vv
+        ```
+
+    **SUMMARY**
+
+    Pros:
+
+    - fully self-contained solution within K8S cluster
+
+    Cons:
+
+    - high complexity of the official GlusterFS docker image: https://hub.docker.com/r/gluster/gluster-centos/dockerfile, meaning GlusterFS is not so "container-ready"
 
 ### known issues
+
+#### kubespray
 
 1. **BUG** - **FIXED** - "Disable swap" task is failing on CentOS 7 at [roles/kubernetes/preinstall/tasks/0010-swapoff.yml](../../roles/kubernetes/preinstall/tasks/0010-swapoff.yml) cause `swapoff` bin is in the `/usr/sbin` dir which is not a part of the default PATH for ansible.
 
@@ -271,3 +294,10 @@ Usage options:
 
     TODO: try setting `kubedns_manifests: {}` at the k8s-cluster.yml to fix the issue without code changes
 
+#### heketi glusterfs
+
+1. **BUG** - **FIXED** - tasks with LVM commands are failing on CentOS 7 at [contrib/network-storage/heketi/roles/tear-down-disks/tasks/main.yml](../../contrib/network-storage/heketi/roles/tear-down-disks/tasks/main.yml) cause LVM utils bins are in the `/usr/sbin` dir which is not a part of the default PATH for ansible.
+
+Fixed by adding the `/sbin:/usr/sbin` to the environment of the tasks
+
+2. **BUG** - **FIXED** - improper syntax of the assert tasks at [contrib/network-storage/heketi/roles/provision/tasks/secret.yml](../../contrib/network-storage/heketi/roles/provision/tasks/secret.yml)

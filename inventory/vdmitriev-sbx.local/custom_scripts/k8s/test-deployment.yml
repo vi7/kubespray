@@ -27,23 +27,24 @@ spec:
       #   kubernetes.io/hostname: inw-vm60.rfiserve.net
       volumes:
         - name: test-depl-vol
-          # persistentVolumeClaim:
-          #   claimName: perms-pvc
-          glusterfs:
-            endpoints: ovirt-glusterfs
-            path: k8s
-# ---
-# apiVersion: v1
-# kind: PersistentVolumeClaim
-# metadata:
-#   name: test-depl-pvc
-# spec:
-#   accessModes:
-#     - ReadWriteOnce
-#   resources:
-#     requests:
-#       storage: 250Mi
-#   # selector:
-#   #   matchLabels:
-#   #     release: "stable"
-#   volumeName: test-depl-pv
+          persistentVolumeClaim:
+            claimName: test-depl-pvc
+          # glusterfs:
+          #   endpoints: ovirt-glusterfs
+          #   path: k8s
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-depl-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 250Mi
+  storageClassName: gluster
+  # selector:
+  #   matchLabels:
+  #     release: "stable"
+  # volumeName: test-depl-pv

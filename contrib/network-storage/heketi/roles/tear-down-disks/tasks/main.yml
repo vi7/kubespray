@@ -16,6 +16,8 @@
 - name: "Get volume group information."
   become: true
   shell: "pvs {{ disk_volume_device_1 }} --option vg_name | tail -n+2"
+  environment:
+    PATH: '/sbin:/usr/sbin:{{ ansible_env.PATH }}'
   register: "volume_groups"
   ignore_errors: true
   changed_when: false
@@ -23,12 +25,16 @@
 - name: "Remove volume groups."
   become: true
   command: "vgremove {{ volume_group }} --yes"
+  environment:
+    PATH: '/sbin:/usr/sbin:{{ ansible_env.PATH }}'
   with_items: "{{ volume_groups.stdout_lines }}"
   loop_control: { loop_var: "volume_group" }
 
 - name: "Remove physical volume from cluster disks."
   become: true
   command: "pvremove {{ disk_volume_device_1 }} --yes"
+  environment:
+    PATH: '/sbin:/usr/sbin:{{ ansible_env.PATH }}'
   ignore_errors: true
 
 - name: "Remove lvm utils (RedHat)"
