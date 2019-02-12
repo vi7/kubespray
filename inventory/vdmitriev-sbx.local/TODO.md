@@ -84,3 +84,4 @@ from the inw-vm21.rfiserve.net VM (3 masters, 2 nodes):
 5. Implement proper etcd scaling (up and down) and nodes replacement
 6. Migrate [custom_scripts/prepare_host.yml](./custom_scripts/prepare_host.yml) to a separate ansible role
 7. GlusterFS/heketi provision logic **should be re-written from scratch** in case in-cluster glusterfs-heketi will be used for persistency.
+8. Schedule automatic cleanup of the 10.0.0.0/8 route at all the cluster nodes (see [custom_scripts/prepare_host.yml](./custom_scripts/prepare_host.yml) for the details)

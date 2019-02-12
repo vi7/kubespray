@@ -214,18 +214,24 @@ Usage options:
 
 2. GlusterFS deployed into the K8S cluster and managed by Heketi. Check here for the details: [contrib/network-storage/heketi/](../../contrib/network-storage/heketi/)
 
-    Steps:
+    Deploy:
 
-    - install jmespath
+    - 3 nodes required
+
+    - install jmespath at the control machine
         ```sh
         pip install jmespath
         ```
 
     - run heketi playbook
         ```sh
+        export ANSIBLE_REMOTE_TMP="/tmp"
         ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.yml contrib/network-storage/heketi/heketi.yml -b -v
         ```
 
+    **Cons:**
+
+    - high complexity of the official GlusterFS docker image: https://hub.docker.com/r/gluster/gluster-centos/dockerfile, meaning that it might be easier to manage a standalone (outside of K8S) GlusterFS cluster
 
 ### known issues
 

@@ -30,7 +30,7 @@
           /sbin/ip route del "{{ ip_route }}"
         fi
 
-- hosts: k8s-cluster
+- hosts: kube-node
   tasks:
     - name: Install glusterfs mount utils
       yum:
