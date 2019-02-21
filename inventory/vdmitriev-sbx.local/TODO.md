@@ -2,9 +2,9 @@ TODO list
 =========
 
 1. HA masters (at least for the external API access)
-2. Review the longest steps in cluster spin up and optimize them if possible. Cluster spinup timing report:
+2. Review the longest steps in cluster spin up and optimize them if possible.  timing report:
 
-  from the local vagrant:
+  cluster spinup from the local vagrant (2 masters, 2 nodes):
 
         Friday 01 February 2019  16:25:11 +0000 (0:00:00.078)       0:21:16.187 ******* 
         =============================================================================== 
@@ -29,7 +29,7 @@ TODO list
         kubernetes-apps/network_plugin/weave : Weave | Wait for Weave to become available -------------- 8.34s
         etcd : wait for etcd up ------------------------------------------------------------------------ 8.29s
 
-  from the inw-vm21.rfiserve.net VM (2 masters, 2 nodes):
+  cluster spinup from the inw-vm21.rfiserve.net VM (2 masters, 2 nodes):
 
         Monday 04 February 2019  10:36:19 -0500 (0:00:00.111)       0:15:04.531 *******
         ===============================================================================
@@ -54,7 +54,7 @@ TODO list
         etcd : Gen_certs | Gather etcd master certs ----------------------------------------------------------------- 5.83s
         kubernetes-apps/network_plugin/weave : Weave | Wait for Weave to become available --------------------------- 5.73s
 
-from the inw-vm21.rfiserve.net VM (3 masters, 2 nodes):
+    cluster spinup from the inw-vm21.rfiserve.net VM (3 masters, 2 nodes):
 
         Thursday 07 February 2019  09:51:50 -0500 (0:00:00.244)       0:20:06.401 ***** 
         =============================================================================== 
@@ -79,9 +79,35 @@ from the inw-vm21.rfiserve.net VM (3 masters, 2 nodes):
         etcd : wait for etcd up ------------------------------------------------------------------------------------- 7.31s
         etcd : Gen_certs | Gather etcd master certs ----------------------------------------------------------------- 7.26s
 
+adding 1 worker node via `scale.yml` from the inw-vm21.rfiserve.net VM (initially 3 masters, 2 nodes):
+
+        Thursday 21 February 2019  07:11:21 -0500 (0:00:00.435)       0:07:51.547 ***** 
+        =============================================================================== 
+        container-engine/docker : ensure docker packages are installed -------------------------------------------- 37.00s
+        kubernetes/preinstall : Update package management cache (YUM) --------------------------------------------- 16.96s
+        download : file_download | Download item ------------------------------------------------------------------ 10.61s
+        container-engine/docker : Docker | pause while Docker restarts -------------------------------------------- 10.21s
+        kubernetes/preinstall : Hosts | populate inventory into hosts file ----------------------------------------- 7.28s
+        container-engine/docker : Ensure old versions of Docker are not installed. | RedHat ------------------------ 7.16s
+        kubernetes/preinstall : Install packages requirements ------------------------------------------------------ 6.31s
+        download : Download items ---------------------------------------------------------------------------------- 6.00s
+        download : file_download | Download item ------------------------------------------------------------------- 5.32s
+        download : container_download | Download containers if pull is required or told to always pull (all nodes) - 4.90s
+        download : Sync container ---------------------------------------------------------------------------------- 4.70s
+        download : container_download | Download containers if pull is required or told to always pull (all nodes) - 4.62s
+        download : container_download | Download containers if pull is required or told to always pull (all nodes) - 4.26s
+        download : container_download | Download containers if pull is required or told to always pull (all nodes) - 4.05s
+        bootstrap-os : Install pip for bootstrap ------------------------------------------------------------------- 3.87s
+        bootstrap-os : Install packages requirements for bootstrap ------------------------------------------------- 3.50s
+        download : Download items ---------------------------------------------------------------------------------- 3.41s
+        kubernetes/node : nginx-proxy | Write nginx-proxy configuration -------------------------------------------- 3.39s
+        download : Sync container ---------------------------------------------------------------------------------- 3.35s
+        download : Sync container ---------------------------------------------------------------------------------- 3.33s
+
 3. Automatically add permissions for jenkins volume (1000:1000)
 4. Implement proper master scaling (up and down) and nodes replacement
 5. Implement proper etcd scaling (up and down) and nodes replacement
 6. Migrate [custom_scripts/prepare_host.yml](./custom_scripts/prepare_host.yml) to a separate ansible role
 7. GlusterFS/heketi provision logic **should be re-written from scratch** in case in-cluster glusterfs-heketi will be used for persistency.
 8. Schedule automatic cleanup of the 10.0.0.0/8 route at all the cluster nodes (see [custom_scripts/prepare_host.yml](./custom_scripts/prepare_host.yml) for the details)
+9. Check possibility of the following mode for PVC: virtual block device over GlusterFS (the way oVirt is working with disks)

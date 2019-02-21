@@ -74,7 +74,7 @@ remove_node() {
 prepare_host() {
   export ANSIBLE_REMOTE_TMP="/tmp"
 
-  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.yml inventory/$CLUSTER_NAME/custom_scripts/prepare_host.yml -b
+  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.yml inventory/$CLUSTER_NAME/custom_scripts/prepare_host.yml -b -v
 }
 
 cluster_admin_create() {
