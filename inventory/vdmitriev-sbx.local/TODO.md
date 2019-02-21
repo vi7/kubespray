@@ -111,3 +111,5 @@ adding 1 worker node via `scale.yml` from the inw-vm21.rfiserve.net VM (initiall
 7. GlusterFS/heketi provision logic **should be re-written from scratch** in case in-cluster glusterfs-heketi will be used for persistency.
 8. Schedule automatic cleanup of the 10.0.0.0/8 route at all the cluster nodes (see [custom_scripts/prepare_host.yml](./custom_scripts/prepare_host.yml) for the details)
 9. Check possibility of the following mode for PVC: virtual block device over GlusterFS (the way oVirt is working with disks)
+10. Fix all the workarounds, see [known issues section of the README](README.md#known-issues), everything what is marked as "**BUG** - **WORKAROUND** -"
+11. Check why heketi/glusterfs PV minimal capaicty is 1GB (even when PVC requests less)

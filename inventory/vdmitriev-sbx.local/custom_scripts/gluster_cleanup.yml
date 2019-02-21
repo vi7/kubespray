@@ -1,0 +1,22 @@
+---
+# Ansible playbook which cleanups GlusterFS/Heketi leftovers not cleaned up properly by the 
+#
+# Should be executed after kubespray::contrib/network-storage/heketi/heketi-tear-down.yml
+
+# TODO: transfer it to the separate Ansible role
+
+- hosts: k8s-cluster:heketi-node
+  vars:
+    gluster_paths:
+      - /var/lib/heketi
+      - /etc/glusterfs
+      - /var/log/glusterfs
+      - /var/lib/glusterd
+      # see contrib/network-storage/heketi/roles/provision/tasks/bootstrap/topology.yml:16 for the explanation
+      - "{{ kube_config_dir }}/topology.json"
+  tasks:
+    - name: Wipe out GlusterFS and Heketi data from the cluster nodes
+      file:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ gluster_paths }}"

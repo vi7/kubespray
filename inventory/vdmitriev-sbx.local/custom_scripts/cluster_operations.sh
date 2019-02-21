@@ -28,6 +28,7 @@ Script should be launched from the kubespray repo root.
 `basename $0` add_node - add worker node to the cluster
 `basename $0` remove_node <node list> - remove worker node from the cluster, <node list> - comma-separated list of node names
 `basename $0` prepare_host - run hacks required to prepare VMs for K8S
+`basename $0` gluster_cleanup - cleanup nodes from GlusterFS/Heketi leftovers not cleaned up properly by the heketi-tear-down.yml
 `basename $0` cluster_admin_create - create cluster admin service account
 `basename $0` cluster_admin_token - get cluster admin token
 `basename $0` anonymous_service_access - create cluster role which enables anonymous access to the k8s service endpoints via API
@@ -75,6 +76,12 @@ prepare_host() {
   export ANSIBLE_REMOTE_TMP="/tmp"
 
   ansible-playbook -i inventory/$CLUSTER_NAME/hosts.yml inventory/$CLUSTER_NAME/custom_scripts/prepare_host.yml -b -v
+}
+
+gluster_cleanup() {
+  export ANSIBLE_REMOTE_TMP="/tmp"
+
+  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.yml inventory/$CLUSTER_NAME/custom_scripts/gluster_cleanup.yml -b -v
 }
 
 cluster_admin_create() {

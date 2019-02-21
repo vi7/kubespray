@@ -215,6 +215,7 @@ Usage options:
     Cons:
 
     - volumes should be managed by some mechanism outside of a K8S cluster which makes procedure of volume claiming complex (i.e. not fully controlled by the K8S cluster)
+    - containers are writing to the volume directly which might end up with huge amount of files per volume and break GlusterFS sync mechanism
 
 
     TODO: try volume management with Heketi, thus allowing external GlusterFS being managed by K8S
@@ -253,6 +254,7 @@ Usage options:
     Cons:
 
     - high complexity of the official GlusterFS docker image: https://hub.docker.com/r/gluster/gluster-centos/dockerfile, meaning GlusterFS is not so "container-ready"
+    - containers are writing to the volume directly which might end up with huge amount of files per volume and break GlusterFS sync mechanism
 
 ### known issues
 
@@ -301,3 +303,23 @@ Usage options:
 Fixed by adding the `/sbin:/usr/sbin` to the environment of the tasks
 
 2. **BUG** - **FIXED** - improper syntax of the assert tasks at [contrib/network-storage/heketi/roles/provision/tasks/secret.yml](../../contrib/network-storage/heketi/roles/provision/tasks/secret.yml)
+
+3. **BUG** - **WORKAROUND** - `lvmetad.socket` issue. Supposed to happen after `heketi-tear-down.yml` execution
+
+        /run/lvm/lvmetad.socket: connect failed: Connection refused                                                                                                                                                                        
+        WARNING: Failed to connect to lvmetad. Falling back to device scanning.
+
+    currently solved by manual restart of the lvmetad.socket on all the nodes:
+    ```sh
+    systemctl restart lvm2-lvmetad.socket
+    ```
+
+4. **BUG** - **FIXED** - `heketi-tear-down.yml` execution doesn't cleanup directories on the nodes
+
+    examples of gluster/heketi pathes which should be cleaned up:
+    - [contrib/network-storage/heketi/roles/provision/templates/glusterfs-daemonset.json.j2](../../contrib/network-storage/heketi/roles/provision/templates/glusterfs-daemonset.json.j2)
+
+    Fixed by adding cleanup function to the cluster_operations script:
+    ```sh
+    inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh gluster_cleanup
+    ```
