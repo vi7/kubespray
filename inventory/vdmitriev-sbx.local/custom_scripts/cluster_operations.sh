@@ -13,7 +13,7 @@ set -e
 
 CLUSTER_NAME="vdmitriev-sbx.local"
 
-JENKINS_CHART_VER="0.28.9"
+JENKINS_CHART_VER="0.32.9"
 JENKINS_RELEASE_NAME="jenkins-sbx"
 
 #############
@@ -123,15 +123,11 @@ helm_kill() {
 }
 
 jenkins_install() {
-  helm install -n $JENKINS_RELEASE_NAME -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/jenkins_sbx/values.yml --version $JENKINS_CHART_VER stable/jenkins
-
-  echo "=============================================="
-  echo "[!!! IMPORTANT !!!] User with id 1000 should have full access to the the volume you provided for jenkins home mount point"
-  echo "=============================================="
+  helm install -n $JENKINS_RELEASE_NAME -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/jenkins_sbx/values.yaml --version $JENKINS_CHART_VER stable/jenkins
 }
 
 jenkins_upgrade() {
-  helm upgrade -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/jenkins_sbx/values.yml --version $JENKINS_CHART_VER $JENKINS_RELEASE_NAME stable/jenkins
+  helm upgrade -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/jenkins_sbx/values.yaml --version $JENKINS_CHART_VER $JENKINS_RELEASE_NAME stable/jenkins
 }
 
 ########
