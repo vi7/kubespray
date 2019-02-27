@@ -1,8 +1,7 @@
 TODO list
 =========
 
-1. HA masters (at least for the external API access)
-2. Review the longest steps in cluster spin up and optimize them if possible.  timing report:
+1. Review the longest steps in cluster spin up and optimize them if possible.  timing report:
 
   cluster spinup from the local vagrant (2 masters, 2 nodes):
 
@@ -104,12 +103,10 @@ adding 1 worker node via `scale.yml` from the inw-vm21.rfiserve.net VM (initiall
         download : Sync container ---------------------------------------------------------------------------------- 3.35s
         download : Sync container ---------------------------------------------------------------------------------- 3.33s
 
-3. Automatically add permissions for jenkins volume (1000:1000)
-4. Implement proper master scaling (up and down) and nodes replacement
-5. Implement proper etcd scaling (up and down) and nodes replacement
-6. Migrate [custom_scripts/prepare_host.yml](./custom_scripts/prepare_host.yml) to a separate ansible role
-7. GlusterFS/heketi provision logic **should be re-written from scratch** in case in-cluster glusterfs-heketi will be used for persistency.
-8. Schedule automatic cleanup of the 10.0.0.0/8 route at all the cluster nodes (see [custom_scripts/prepare_host.yml](./custom_scripts/prepare_host.yml) for the details)
-9. Check possibility of the following mode for PVC: virtual block device over GlusterFS (the way oVirt is working with disks)
-10. Fix all the workarounds, see [known issues section of the README](README.md#known-issues), everything what is marked as "**BUG** - **WORKAROUND** -"
-11. Check why heketi/glusterfs PV minimal capaicty is 1GB (even when PVC requests less)
+2. Implement proper master scaling (up and down) and nodes replacement
+3. Implement proper etcd scaling (up and down) and nodes replacement
+4. GlusterFS/heketi provision logic **should be re-written from scratch** in case in-cluster glusterfs-heketi will be used for persistency.
+5. Schedule automatic cleanup of the 10.0.0.0/8 route at all the cluster nodes (see [custom_scripts/prepare_host.yml](./custom_scripts/prepare_host.yml) for the details)
+6. Check possibility of the following mode for PVC: virtual block device over GlusterFS (the way oVirt is working with disks)
+7. Fix all the workarounds, see [known issues section of the README](README.md#known-issues), everything what is marked as "**BUG** - **WORKAROUND** -"
+8. Check why heketi/glusterfs PV minimal capaicty is 1GB (even when PVC requests less)

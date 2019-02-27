@@ -243,6 +243,7 @@ Usage options:
         ```sh
         export ANSIBLE_REMOTE_TMP="/tmp"
         ansible-playbook -i inventory/vdmitriev-sbx.local/hosts.yml contrib/network-storage/heketi/heketi-tear-down.yml -b -vv
+        inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh gluster_cleanup
         ```
 
     **SUMMARY**
@@ -253,7 +254,7 @@ Usage options:
 
     Cons:
 
-    - high complexity of the official GlusterFS docker image: https://hub.docker.com/r/gluster/gluster-centos/dockerfile, meaning GlusterFS is not so "container-ready"
+    - high complexity of the official GlusterFS docker image: https://hub.docker.com/r/gluster/gluster-centos/dockerfile, which requires full access to the host in a runtime including log writing to the host `/var/log`, meaning GlusterFS is not "container-ready" and has no big differences to the host GlusterFS deployment
     - containers are writing to the volume directly which might end up with huge amount of files per volume and break GlusterFS sync mechanism
 
 ### known issues
