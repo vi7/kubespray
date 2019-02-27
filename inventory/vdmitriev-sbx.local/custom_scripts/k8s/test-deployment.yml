@@ -5,7 +5,7 @@ metadata:
   labels:
     app: test-depl-app
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: test-container-app
@@ -16,34 +16,37 @@ spec:
     spec:
       containers:
       - name: test-container
-        image: alpine
-        command: ['sh']
-        stdin: true
-        tty: true
-        volumeMounts:
-          - mountPath: /mnt/test_depl_data
-            name: test-depl-vol
+        # image: alpine
+        # command: ['sh']
+        # stdin: true
+        # tty: true
+        image: containous/whoami
+        ports:
+        - containerPort: 80
+        # volumeMounts:
+        #   - mountPath: /mnt/test_depl_data
+        #     name: test-depl-vol
       # nodeSelector:
       #   kubernetes.io/hostname: inw-vm60.rfiserve.net
-      volumes:
-        - name: test-depl-vol
-          persistentVolumeClaim:
-            claimName: test-depl-pvc
+      # volumes:
+      #   - name: test-depl-vol
+      #     persistentVolumeClaim:
+      #       claimName: test-depl-pvc
           # glusterfs:
           #   endpoints: ovirt-glusterfs
           #   path: k8s
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: test-depl-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 250Mi
-  storageClassName: gluster
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: test-depl-pvc
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 250Mi
+#   storageClassName: gluster
   # selector:
   #   matchLabels:
   #     release: "stable"

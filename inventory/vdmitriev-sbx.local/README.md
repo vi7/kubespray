@@ -257,6 +257,11 @@ Usage options:
     - high complexity of the official GlusterFS docker image: https://hub.docker.com/r/gluster/gluster-centos/dockerfile, which requires full access to the host in a runtime including log writing to the host `/var/log`, meaning GlusterFS is not "container-ready" and has no big differences to the host GlusterFS deployment
     - containers are writing to the volume directly which might end up with huge amount of files per volume and break GlusterFS sync mechanism
 
+#### metallb
+
+
+
+
 ### known issues
 
 #### kubespray

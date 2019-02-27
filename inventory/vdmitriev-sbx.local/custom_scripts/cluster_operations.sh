@@ -13,6 +13,8 @@ set -e
 
 CLUSTER_NAME="vdmitriev-sbx.local"
 
+METALLB_CHART_VER="0.8.4"
+METALLB_RELEASE_NAME="metallb"
 JENKINS_CHART_VER="0.32.9"
 JENKINS_RELEASE_NAME="jenkins-sbx"
 
@@ -34,6 +36,8 @@ Script should be launched from the kubespray repo root.
 `basename $0` anonymous_service_access - create cluster role which enables anonymous access to the k8s service endpoints via API
 `basename $0` helm_init - create tiller service account and deploy tiller into the cluster
 `basename $0` helm_kill - remove tiller service account and tiller from the cluster
+`basename $0` metallb_install - install MetalLB chart into the cluster
+`basename $0` metallb_upgrade - upgrade MetalLB chart
 `basename $0` jenkins_install - install jenkins chart into the cluster
 `basename $0` jenkins_upgrade - upgrade jenkins chart
   "
@@ -120,6 +124,14 @@ helm_init() {
 helm_kill() {
   kubectl -n kube-system delete deploy -l name=tiller
   kubectl delete -f inventory/$CLUSTER_NAME/custom_scripts/k8s/tiller-rbac-config.yml
+}
+
+metallb_install() {
+  helm install -n $METALLB_RELEASE_NAME -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/metallb/values.yaml --version $METALLB_CHART_VER stable/metallb
+}
+
+metallb_upgrade() {
+  helm upgrade -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/metallb/values.yaml --version $METALLB_CHART_VER $METALLB_RELEASE_NAME stable/metallb
 }
 
 jenkins_install() {
