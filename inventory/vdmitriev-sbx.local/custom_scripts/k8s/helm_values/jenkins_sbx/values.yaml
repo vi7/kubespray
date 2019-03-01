@@ -65,10 +65,10 @@ Master:
   # When setting RunAsUser to a different value than 0 also set FsGroup to the same value:
   RunAsUser: 1000
   FsGroup: 1000 
-  ServicePort: 80
+  ServicePort: 8080
   # For minikube, set this to NodePort, elsewhere use LoadBalancer
   # Use ClusterIP if your setup includes ingress controller
-  ServiceType: LoadBalancer
+  ServiceType: NodePort
   # Master Service annotations
   ServiceAnnotations: {}
   # Master Custom Labels
