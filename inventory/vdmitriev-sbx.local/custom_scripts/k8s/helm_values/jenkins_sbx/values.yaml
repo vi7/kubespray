@@ -33,7 +33,7 @@ Master:
   # a restart loop.  Likewise if you disable the non-Jenkins identity store and instead use the Jenkins internal one,
   # you should revert Master.AdminUser to your preferred admin user:
   AdminUser: admin
-  # AdminPassword: <defaults to random>
+  #AdminPassword:
   OwnSshKey: false
   # If CasC auto-reload is enabled, an SSH (RSA) keypair is needed.  Can either provide your own, or leave unconfigured\false to allow a random key to be auto-generated.
   # If you choose to use your own, you must upload your decrypted RSA private key (not the public key above) to a Kubernetes secret using the following command:
@@ -65,10 +65,10 @@ Master:
   # When setting RunAsUser to a different value than 0 also set FsGroup to the same value:
   RunAsUser: 1000
   FsGroup: 1000 
-  ServicePort: 8080
+  ServicePort: 80
   # For minikube, set this to NodePort, elsewhere use LoadBalancer
   # Use ClusterIP if your setup includes ingress controller
-  ServiceType: NodePort
+  ServiceType: LoadBalancer
   # Master Service annotations
   ServiceAnnotations: {}
   # Master Custom Labels

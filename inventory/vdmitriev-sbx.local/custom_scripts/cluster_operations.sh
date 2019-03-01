@@ -139,7 +139,20 @@ jenkins_install() {
 }
 
 jenkins_upgrade() {
-  helm upgrade -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/jenkins_sbx/values.yaml --version $JENKINS_CHART_VER $JENKINS_RELEASE_NAME stable/jenkins
+  while :
+  do
+    echo -e "\nEnter Jenkins admin password"
+    echo "[WARN] provided password will overwrite your exsting one!"
+    read -r JENKINS_ADMIN_PASS
+    if [ "x$JENKINS_ADMIN_PASS" != "x" ]
+    then
+      break
+    else
+      echo "[ERROR] admin password should not be empty!" >&2
+      continue
+    fi
+  done
+  helm upgrade -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/jenkins_sbx/values.yaml --set Master.AdminPassword="$JENKINS_ADMIN_PASS" --version $JENKINS_CHART_VER $JENKINS_RELEASE_NAME stable/jenkins
 }
 
 ########
