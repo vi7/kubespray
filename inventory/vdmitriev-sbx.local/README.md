@@ -20,9 +20,11 @@ Stuff located in [this](./) dir is under the active development. README might no
   * [cluster admin service account](#cluster-admin-service-account)
   * [helm](#helm)
   * [glusterfs](#glusterfs)
+  * [metallb](#metallb)
 - [known issues](#known-issues)
   * [kubespray](#kubespray)
   * [heketi glusterfs](#heketi-glusterfs)
+  * [metallb issues](#metallb-issues)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -259,7 +261,19 @@ Usage options:
 
 #### metallb
 
+MetalLB installation should be managed via Helm using official Helm chart. In spite of what is written in the official MetalLB docs, Helm chart installs the latest available MetalLB.
 
+Custom MetalLB values are [here](../../inventory/vdmitriev-sbx.local/custom_scripts/k8s/helm_values/metallb/values.yaml)
+
+MetalLB release installation:
+```sh
+inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh metallb_install
+```
+
+MetalLB release upgrade:
+```sh
+inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh metallb_upgrade
+```
 
 
 ### known issues
@@ -328,4 +342,17 @@ Fixed by adding the `/sbin:/usr/sbin` to the environment of the tasks
     Fixed by adding cleanup function to the cluster_operations script:
     ```sh
     inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh gluster_cleanup
+    ```
+
+#### metallb issues
+
+1. **BUG** - **WORKAROUND** - MetalLB doesn't handle properly `loadBalancerSourceRanges` paramter of the k8s service spec, thus blocking external access to the service when:
+    ```yaml
+    loadBalancerSourceRanges:
+    - 0.0.0.0/0
+    ```
+
+    To workaround the issue `loadBalancerSourceRanges` param value should be explicitly empty for all services of a LoadBalancer type. Example from Jenkins helm chart values:
+    ```yaml
+    LoadBalancerSourceRanges: []
     ```

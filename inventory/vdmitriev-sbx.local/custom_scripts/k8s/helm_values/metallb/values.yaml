@@ -8,6 +8,7 @@ configInline:
   address-pools:
   - name: default
     protocol: layer2
+    # TODO: reserved at hosts.yaml and should be released after PoC
     addresses:
     - 172.22.4.127-172.22.4.130
 

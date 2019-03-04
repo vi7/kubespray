@@ -118,7 +118,7 @@ Master:
   # LoadBalancerSourcesRange is a list of allowed CIDR values, which are combined with ServicePort to
   # set allowed inbound rules on the security group assigned to the master load balancer
   #
-  # vdmitriev note: should be empty for MelalLB to work properly
+  # vdmitriev: should be empty as MelalLB doesn't work properly with the default 0.0.0.0/0
   LoadBalancerSourceRanges: []
   # Optionally assign a known public LB IP
   # LoadBalancerIP: 1.2.3.4
