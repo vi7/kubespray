@@ -110,3 +110,4 @@ adding 1 worker node via `scale.yml` from the inw-vm21.rfiserve.net VM (initiall
 6. Check possibility of the following mode for PVC: virtual block device over GlusterFS (the way oVirt is working with disks)
 7. Fix all the workarounds, see [known issues section of the README](README.md#known-issues), everything what is marked as "**BUG** - **WORKAROUND** -"
 8. Check why heketi/glusterfs PV minimal capaicty is 1GB (even when PVC requests less)
+9. Investigate networking issues between node and master containers. kube-proxy? Debug doc: https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/#is-the-kube-proxy-working
