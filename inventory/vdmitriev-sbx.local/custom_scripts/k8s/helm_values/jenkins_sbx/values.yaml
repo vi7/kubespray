@@ -65,10 +65,10 @@ Master:
   # When setting RunAsUser to a different value than 0 also set FsGroup to the same value:
   RunAsUser: 1000
   FsGroup: 1000 
-  ServicePort: 8080
+  ServicePort: 80
   # For minikube, set this to NodePort, elsewhere use LoadBalancer
   # Use ClusterIP if your setup includes ingress controller
-  ServiceType: NodePort
+  ServiceType: LoadBalancer
   # Master Service annotations
   ServiceAnnotations: {}
   # Master Custom Labels
@@ -117,8 +117,9 @@ Master:
 
   # LoadBalancerSourcesRange is a list of allowed CIDR values, which are combined with ServicePort to
   # set allowed inbound rules on the security group assigned to the master load balancer
-  LoadBalancerSourceRanges:
-  - 0.0.0.0/0
+  #
+  # vdmitriev note: should be empty for MelalLB to work properly
+  LoadBalancerSourceRanges: []
   # Optionally assign a known public LB IP
   # LoadBalancerIP: 1.2.3.4
   # Optionally configure a JMX port
