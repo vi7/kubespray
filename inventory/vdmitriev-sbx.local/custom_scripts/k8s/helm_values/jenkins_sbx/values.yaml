@@ -136,12 +136,14 @@ Master:
 
   # List of plugins to be install during Jenkins master start
   InstallPlugins:
-    - kubernetes:1.14.3
+    - kubernetes:1.14.8
     - workflow-job:2.31
     - workflow-aggregator:2.6
     - credentials-binding:1.17
     - git:3.9.1
+    # because blue balls are evil
     - greenballs:1.15
+    - timestamper:1.9
 
   # Enable to always override the installed plugins with the values of 'Master.InstallPlugins' on upgrade or redeployment.
   # OverwritePlugins: true
