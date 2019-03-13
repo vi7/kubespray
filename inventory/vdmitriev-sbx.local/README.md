@@ -18,6 +18,7 @@ Stuff located in [this](./) dir is under the active development. README might no
 - [use cluster](#use-cluster)
   * [configure kubectl](#configure-kubectl)
   * [cluster admin service account](#cluster-admin-service-account)
+  * [monitoring](#monitoring)
   * [helm](#helm)
   * [glusterfs](#glusterfs)
   * [metallb](#metallb)
@@ -163,6 +164,12 @@ Get account token:
 ```sh
 inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh cluster_admin_token
 ```
+
+#### monitoring
+
+Cluster and services monitoring are performed by Prometheus.
+
+Details can be found in the corresponding [README](custom_scripts/k8s/operators/prometheus/README.md)
 
 #### helm
 
