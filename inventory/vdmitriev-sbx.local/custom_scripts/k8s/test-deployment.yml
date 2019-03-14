@@ -3,16 +3,16 @@ kind: Deployment
 metadata:
   name: test-deployment
   labels:
-    app: test-depl-app
+    app: test-container
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: test-container-app
+      app: test-container
   template:
     metadata:
       labels:
-        app: test-container-app
+        app: test-container
     spec:
       containers:
       - name: test-container

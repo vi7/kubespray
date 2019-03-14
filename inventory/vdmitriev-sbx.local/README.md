@@ -22,6 +22,7 @@ Stuff located in [this](./) dir is under the active development. README might no
   * [helm](#helm)
   * [glusterfs](#glusterfs)
   * [metallb](#metallb)
+  * [ingress controller](#ingress-controller)
 - [known issues](#known-issues)
   * [kubespray](#kubespray)
   * [heketi glusterfs](#heketi-glusterfs)
@@ -282,6 +283,26 @@ MetalLB release upgrade:
 inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh metallb_upgrade
 ```
 
+#### ingress controller
+
+[haproxy-ingress](https://github.com/jcmoraisjr/haproxy-ingress) is used as an ingress controller
+
+Ingress controller installation is managed via [Helm chart](https://github.com/helm/charts/tree/master/incubator/haproxy-ingress). You should enable Helm incubator repo in order to get access to this chart:
+```sh
+helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
+```
+
+Custom values are [here](../../inventory/vdmitriev-sbx.local/custom_scripts/k8s/helm_values/haproxy-ingress/values.yaml)
+
+haproxy-ingress release installation:
+```sh
+inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh haproxy_ing_install
+```
+
+haproxy-ingress release upgrade:
+```sh
+inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh haproxy_ing_upgrade
+```
 
 ### known issues
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Custom cluster operations script. See help below for the detaile
+# Custom cluster operations script. See help below for the details
 #
 # MAINTAINERS:
 # Vitaliy Dmitriev
@@ -15,6 +15,8 @@ CLUSTER_NAME="vdmitriev-sbx.local"
 
 METALLB_CHART_VER="0.8.4"
 METALLB_RELEASE_NAME="metallb"
+HAPROXY_CHART_VER="0.0.9"
+HAPROXY_RELEASE_NAME="haproxy-ingress"
 JENKINS_CHART_VER="0.32.9"
 JENKINS_RELEASE_NAME="jenkins-sbx"
 
@@ -38,6 +40,7 @@ Script should be launched from the kubespray repo root.
 `basename $0` helm_kill - remove tiller service account and tiller from the cluster
 `basename $0` metallb_install - install MetalLB chart into the cluster
 `basename $0` metallb_upgrade - upgrade MetalLB chart
+`basename $0` haproxy_ing - install/upgrade haproxy-ingress chart
 `basename $0` jenkins_install - install jenkins chart into the cluster
 `basename $0` jenkins_upgrade - upgrade jenkins chart
   "
@@ -134,6 +137,10 @@ metallb_upgrade() {
   helm upgrade -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/metallb/values.yaml --version $METALLB_CHART_VER $METALLB_RELEASE_NAME stable/metallb
 }
 
+haproxy_ing() {
+  helm upgrade --install --namespace kube-system -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/haproxy-ingress/values.yaml --version $HAPROXY_CHART_VER $HAPROXY_RELEASE_NAME incubator/haproxy-ingress
+}
+
 jenkins_install() {
   helm install -n $JENKINS_RELEASE_NAME -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/jenkins_sbx/values.yaml --version $JENKINS_CHART_VER stable/jenkins
 }
@@ -162,6 +169,13 @@ jenkins_upgrade() {
 if [ ! -f cluster.yml ] || [ ! -d inventory ]
 then
   echo "[ERROR] Please run me from the kubespray repo root!" >&2
+  exit 1
+fi
+
+if [ "x$1" == "x" ]
+then
+  echo -e "[ERROR] provide action!\n" >&2
+  help
   exit 1
 fi
 

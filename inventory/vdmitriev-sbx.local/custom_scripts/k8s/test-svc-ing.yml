@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-service
+  labels:
+    app: test-container
+spec:
+  selector:
+    app: test-container
+  ports:
+  - port: 80
+    protocol: TCP
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: test-ingress
+  labels:
+    app: test-container
+spec:
+  rules:
+  - host: test-container-app
+    http:
+      paths:
+      - backend:
+          serviceName: test-service
+          servicePort: 80
