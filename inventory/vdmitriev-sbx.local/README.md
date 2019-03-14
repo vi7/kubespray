@@ -294,15 +294,11 @@ helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.c
 
 Custom values are [here](../../inventory/vdmitriev-sbx.local/custom_scripts/k8s/helm_values/haproxy-ingress/values.yaml)
 
-haproxy-ingress release installation:
+haproxy-ingress release installation/upgrade:
 ```sh
-inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh haproxy_ing_install
+inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh haproxy_ing
 ```
 
-haproxy-ingress release upgrade:
-```sh
-inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh haproxy_ing_upgrade
-```
 
 ### known issues
 
