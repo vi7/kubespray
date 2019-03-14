@@ -16,3 +16,8 @@ spec:
   endpoints:
   - path: /prometheus
     port: http
+    metricRelabelings:
+    - action: drop
+      regex: jenkins_node_jenkins_sbx_slave_.*_builds.*
+      sourceLabels:
+      - __name__
