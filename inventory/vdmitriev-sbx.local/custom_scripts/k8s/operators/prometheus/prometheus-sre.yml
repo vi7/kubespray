@@ -18,7 +18,11 @@ spec:
   retention: 3d
   resources:
     requests:
+      cpu: 250m
       memory: 400Mi
+    limits:
+      cpu: 250m
+      memory: 800Mi
   ruleSelector:
     matchLabels:
       prometheus: sre
@@ -32,6 +36,15 @@ spec:
   serviceMonitorSelector:
     matchLabels:
       team: sre
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: gluster
   version: v2.5.0
 ---
 apiVersion: v1

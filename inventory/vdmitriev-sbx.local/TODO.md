@@ -111,5 +111,4 @@ adding 1 worker node via `scale.yml` from the inw-vm21.rfiserve.net VM (initiall
 7. Check why heketi/glusterfs PV minimal capaicty is 1GB (even when PVC requests less)
 8. Investigate networking issues between node and master containers. kube-proxy? Debug doc: https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/#is-the-kube-proxy-working
 9. Prometheus operator deployment via Helm chart
-10. Persistent storage for Prometheus metrics
-11. Prometheus: add LVM monitoring capability, node-exporter is not able to do that. Use textfile metrics helper?
+10. Prometheus: add LVM monitoring capability, node-exporter is not able to do that. Use textfile metrics helper?
