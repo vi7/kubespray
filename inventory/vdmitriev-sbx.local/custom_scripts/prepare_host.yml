@@ -1,4 +1,4 @@
-# Ansible playbook with some dirty hacks needed to make oVirt VM kubespray friendly
+# Ansible playbook with some dirty hacks needed to make VMs kubespray friendly
 #
 # Should be executed before kubespray cluster.yml
 
@@ -8,27 +8,33 @@
   vars:
     sysctl_conf_path: /etc/sysctl.conf
     ip_route: 10.0.0.0/8
+    daemontools_services:
+      - puppet4
+      - logstash-shipper
+      - graphite-proxy
   tasks:
-    - name: Disable puppet auto execution service
+    - name: Disable daemontools controlled service to free up resources
       svc:
-        name: puppet4
+        name: "{{ item }}"
         state: stopped
         downed: yes
-    - name: Disable logstash service
-      svc:
-        name: logstash-shipper
-        state: stopped
-        downed: yes
+      loop: "{{ daemontools_services }}"
     - name: "Remove ipv6 records from the {{ sysctl_conf_path }}"
       replace:
         path: "{{ sysctl_conf_path }}"
         regexp: '^net\.ipv6.*'
-    - name: "{{ ip_route }} route conflicts with K8S network. Remove it"
-      shell: |
-        if /sbin/ip route | grep "{{ ip_route }}" >/dev/null 2>&1
-        then
-          /sbin/ip route del "{{ ip_route }}"
-        fi
+    - name: disable conflicting route
+      replace:
+        path: /etc/sysconfig/network-scripts/route-eth0
+        regexp: '^(10\.0\.0\.0\/8 via 172\.22\.4\.249)$'
+        replace: '#\1'
+      notify:
+        - restart network
+  handlers:
+    - name: restart network
+      service:
+        name: network
+        state: restarted
 
 - hosts: kube-node
   tasks:

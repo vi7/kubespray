@@ -106,11 +106,10 @@ adding 1 worker node via `scale.yml` from the inw-vm21.rfiserve.net VM (initiall
 2. Implement proper master scaling (up and down) and nodes replacement
 3. Implement proper etcd scaling (up and down) and nodes replacement
 4. GlusterFS/heketi provision logic **should be re-written from scratch** in case in-cluster glusterfs-heketi will be used for persistency.
-5. Schedule automatic cleanup of the 10.0.0.0/8 route at all the cluster nodes (see [custom_scripts/prepare_host.yml](./custom_scripts/prepare_host.yml) for the details)
-6. Check possibility of the following mode for PVC: virtual block device over GlusterFS (the way oVirt is working with disks)
-7. Fix all the workarounds, see [known issues section of the README](README.md#known-issues), everything what is marked as "**BUG** - **WORKAROUND** -"
-8. Check why heketi/glusterfs PV minimal capaicty is 1GB (even when PVC requests less)
-9. Investigate networking issues between node and master containers. kube-proxy? Debug doc: https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/#is-the-kube-proxy-working
-10. Prometheus operator deployment via Helm chart
-11. Persistent storage for Prometheus metrics
-12. Prometheus: add LVM monitoring capability, node-exporter is not able to do that. Use textfile metrics helper?
+5. Check possibility of the following mode for PVC: virtual block device over GlusterFS (the way oVirt is working with disks)
+6. Fix all the workarounds, see [known issues section of the README](README.md#known-issues), everything what is marked as "**BUG** - **WORKAROUND** -"
+7. Check why heketi/glusterfs PV minimal capaicty is 1GB (even when PVC requests less)
+8. Investigate networking issues between node and master containers. kube-proxy? Debug doc: https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/#is-the-kube-proxy-working
+9. Prometheus operator deployment via Helm chart
+10. Persistent storage for Prometheus metrics
+11. Prometheus: add LVM monitoring capability, node-exporter is not able to do that. Use textfile metrics helper?
