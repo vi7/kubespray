@@ -22,7 +22,7 @@ spec:
       memory: 400Mi
     limits:
       cpu: 250m
-      memory: 800Mi
+      memory: 1Gi
   ruleSelector:
     matchLabels:
       prometheus: sre
@@ -43,7 +43,7 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 1Gi
+            storage: 3Gi
         storageClassName: gluster
   version: v2.5.0
 ---
