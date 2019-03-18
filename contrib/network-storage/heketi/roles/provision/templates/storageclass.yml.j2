@@ -6,6 +6,7 @@ metadata:
   annotations:
     storageclass.beta.kubernetes.io/is-default-class: "true"
 provisioner: kubernetes.io/glusterfs
+allowVolumeExpansion: true
 parameters:
   resturl: "http://{{ endpoint_address }}:8080"
   restuser: "admin"
