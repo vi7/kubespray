@@ -15,7 +15,7 @@ spec:
   nodeSelector:
     beta.kubernetes.io/os: linux
   replicas: 1
-  retention: 3d
+  retention: 2d
   resources:
     requests:
       cpu: 250m

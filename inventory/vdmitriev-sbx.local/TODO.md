@@ -112,3 +112,4 @@ adding 1 worker node via `scale.yml` from the inw-vm21.rfiserve.net VM (initiall
 8. Investigate networking issues between node and master containers. kube-proxy? Debug doc: https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/#is-the-kube-proxy-working
 9. Prometheus operator deployment via Helm chart
 10. Prometheus: add LVM monitoring capability, node-exporter is not able to do that. Use textfile metrics helper?
+11. GlusterFS daemonset: review liveness and readiness probe settings
