@@ -113,3 +113,4 @@ adding 1 worker node via `scale.yml` from the inw-vm21.rfiserve.net VM (initiall
 9. Prometheus operator deployment via Helm chart
 10. Prometheus: add LVM monitoring capability, node-exporter is not able to do that. Use textfile metrics helper?
 11. GlusterFS daemonset: review liveness and readiness probe settings
+12. Debug kube-controller-manager and kube-scheduler pod restarts
