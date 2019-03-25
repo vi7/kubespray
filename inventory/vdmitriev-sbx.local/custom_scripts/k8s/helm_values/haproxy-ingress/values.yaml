@@ -25,6 +25,10 @@ controller:
   nodeSelector:
     node-role.kubernetes.io/master: ""
 
+  service:
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: ingress-controller.k8s-sbx.rfiserve.net
+
   stats:
     enabled: true  
 

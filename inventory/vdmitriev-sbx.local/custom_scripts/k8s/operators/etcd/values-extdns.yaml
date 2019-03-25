@@ -1,0 +1,81 @@
+# Default values for etcd-operator.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## Service account names and whether to create them
+serviceAccount:
+  backupOperatorServiceAccount:
+    create: false
+    name:
+  restoreOperatorServiceAccount:
+    create: false
+    name:
+
+# Select what to deploy
+deployments:
+  # one time deployment, delete once completed,
+  # Ref: https://github.com/coreos/etcd-operator/blob/master/doc/user/walkthrough/backup-operator.md
+  backupOperator: false
+  # one time deployment, delete once completed
+  # Ref: https://github.com/coreos/etcd-operator/blob/master/doc/user/walkthrough/restore-operator.md
+  restoreOperator: false
+
+# creates custom resources, not all required,
+# you could use `helm template --values <values.yaml> --name release_name ... `
+# and create the resources yourself to deploy on your cluster later
+customResources:
+  createEtcdClusterCRD: true
+
+# etcdOperator
+etcdOperator:
+  name: etcd-operator
+  image:
+    tag: v0.9.4
+  ## Configurable health checks against the /readyz endpoint that etcd-operator exposes
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+  nodeSelector:
+    node-role.kubernetes.io/master: ""
+  tolerations:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+  - key: CriticalAddonsOnly
+    operator: Exists
+
+## etcd-cluster specific values
+etcdCluster:
+  name: etcd-cluster-extdns
+  size: 1
+  version: 3.3.12
+  image:
+    tag: v3.3.12
+  ## etcd cluster pod specific values
+  ## Ref: https://github.com/coreos/etcd-operator/blob/master/doc/user/spec_examples.md#three-members-cluster-with-resource-requirement
+  pod:
+    resources:
+      limits:
+        cpu: 300m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    nodeSelector:
+      node-role.kubernetes.io/master: ""
+    tolerations:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+    - key: CriticalAddonsOnly
+      operator: Exists
+    persistentVolumeClaimSpec:
+      storageClassName: gluster
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi

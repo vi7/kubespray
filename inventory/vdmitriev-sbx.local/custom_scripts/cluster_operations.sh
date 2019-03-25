@@ -13,10 +13,21 @@ set -e
 
 CLUSTER_NAME="vdmitriev-sbx.local"
 
+ETCD_OPERATOR_CHART_VER="0.8.3"
+ETCD_OPERATOR_RELEASE_NAME="etcd-operator"
+
+EXTDNS_NS_NAME="extdns"
+COREDNS_CHART_VER="1.2.5"
+COREDNS_RELEASE_NAME="coredns-ext"
+EXTERNAL_DNS_CHART_VER="1.7.1"
+EXTERNAL_DNS_RELEASE_NAME="external-dns"
+
 METALLB_CHART_VER="0.8.4"
 METALLB_RELEASE_NAME="metallb"
+
 HAPROXY_CHART_VER="0.0.9"
 HAPROXY_RELEASE_NAME="haproxy-ingress"
+
 JENKINS_CHART_VER="0.32.9"
 JENKINS_RELEASE_NAME="jenkins-sbx"
 
@@ -30,18 +41,20 @@ Script should be launched from the kubespray repo root.
 
 `basename $0` start_cluster - launch cluster from scratch or update config of the existing one (e.g. adding masters or etcd nodes)
 `basename $0` add_node - add worker node to the cluster
-`basename $0` remove_node <node list> - remove worker node from the cluster, <node list> - comma-separated list of node names
+`basename $0` remove_node <node list> - remove worker node, <node list> - comma-separated list of node names
 `basename $0` prepare_host - run hacks required to prepare VMs for K8S
 `basename $0` gluster_cleanup - cleanup nodes from GlusterFS/Heketi leftovers not cleaned up properly by the heketi-tear-down.yml
 `basename $0` cluster_admin_create - create cluster admin service account
 `basename $0` cluster_admin_token - get cluster admin token
 `basename $0` anonymous_service_access - create cluster role which enables anonymous access to the k8s service endpoints via API
-`basename $0` helm_init - create tiller service account and deploy tiller into the cluster
-`basename $0` helm_kill - remove tiller service account and tiller from the cluster
-`basename $0` metallb_install - install MetalLB chart into the cluster
+`basename $0` helm_init - create tiller service account and deploy tiller
+`basename $0` helm_kill - remove tiller service account and tiller
+`basename $0` etcd_operator_install - install etcd operator chart. Currently limited to \"$EXTDNS_NS_NAME\" only
+`basename $0` extdns - install/upgrade DNS services charts (CoreDNS and ExternalDNS)
+`basename $0` metallb_install - install MetalLB chart
 `basename $0` metallb_upgrade - upgrade MetalLB chart
 `basename $0` haproxy_ing - install/upgrade haproxy-ingress chart
-`basename $0` jenkins_install - install jenkins chart into the cluster
+`basename $0` jenkins_install - install jenkins chart
 `basename $0` jenkins_upgrade - upgrade jenkins chart
   "
 }
@@ -127,6 +140,30 @@ helm_init() {
 helm_kill() {
   kubectl -n kube-system delete deploy -l name=tiller
   kubectl delete -f inventory/$CLUSTER_NAME/custom_scripts/k8s/tiller-rbac-config.yml
+}
+
+etcd_operator_install() {
+  helm install --namespace $EXTDNS_NS_NAME \
+    -f inventory/$CLUSTER_NAME/custom_scripts/k8s/operators/etcd/values-extdns.yaml \
+    --version $ETCD_OPERATOR_CHART_VER \
+    -n $ETCD_OPERATOR_RELEASE_NAME \
+    stable/etcd-operator
+}
+
+extdns() {
+  kubectl get ns $EXTDNS_NS_NAME >/dev/null 2>&1 || kubectl create ns $EXTDNS_NS_NAME
+
+  helm upgrade --install --namespace $EXTDNS_NS_NAME \
+  -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/coredns/values.yaml \
+  --version $COREDNS_CHART_VER \
+  $COREDNS_RELEASE_NAME \
+  stable/coredns
+  
+  helm upgrade --install --namespace $EXTDNS_NS_NAME \
+  -f inventory/$CLUSTER_NAME/custom_scripts/k8s/helm_values/external-dns/values.yaml \
+  --version $EXTERNAL_DNS_CHART_VER \
+  $EXTERNAL_DNS_RELEASE_NAME \
+  stable/external-dns
 }
 
 metallb_install() {

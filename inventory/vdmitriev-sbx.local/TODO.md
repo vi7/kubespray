@@ -108,9 +108,9 @@ adding 1 worker node via `scale.yml` from the inw-vm21.rfiserve.net VM (initiall
 4. GlusterFS/heketi provision logic **should be re-written from scratch** in case in-cluster glusterfs-heketi will be used for persistency.
 5. Check possibility of the following mode for PVC: virtual block device over GlusterFS (the way oVirt is working with disks)
 6. Fix all the workarounds, see [known issues section of the README](README.md#known-issues), everything what is marked as "**BUG** - **WORKAROUND** -"
-7. Check why heketi/glusterfs PV minimal capaicty is 1GB (even when PVC requests less)
-8. Investigate networking issues between node and master containers. kube-proxy? Debug doc: https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/#is-the-kube-proxy-working
-9. Prometheus operator deployment via Helm chart
-10. Prometheus: add LVM monitoring capability, node-exporter is not able to do that. Use textfile metrics helper?
-11. GlusterFS daemonset: review liveness and readiness probe settings
-12. Debug kube-controller-manager and kube-scheduler pod restarts
+7. Investigate networking issues between node and master containers. kube-proxy? Debug doc: https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/#is-the-kube-proxy-working
+8. Prometheus: add LVM monitoring capability, node-exporter is not able to do that. Use textfile metrics helper?
+9. GlusterFS daemonset: review liveness and readiness probe settings
+10. Debug kube-controller-manager and kube-scheduler pod restarts
+11. Helm is not updating CRDs (TPRs) for etcd-operator chart
+

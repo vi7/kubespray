@@ -20,6 +20,7 @@ Stuff located in [this](./) dir is under the active development. README might no
   * [cluster admin service account](#cluster-admin-service-account)
   * [monitoring](#monitoring)
   * [helm](#helm)
+  * [external DNS](#external-dns)
   * [glusterfs](#glusterfs)
   * [metallb](#metallb)
   * [ingress controller](#ingress-controller)
@@ -190,6 +191,33 @@ inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh helm_kill
 
 ```
 
+#### external DNS
+
+A bundle of CoreDNS (deployed as a user app and working in external mode) and ExternalDNS is used in order to make cluster Service and Ingress resources discoverable by the hostname externally.
+
+> NOTE: CoreDNS mentioned above shouldn't be confused with CoreDNS deployed by kubespray during cluster spin-up. The latter provides in-cluster DNS service as a replacement to Kube/SkyDNS
+
+**Prerequisites**
+
+etcd cluster is a prerequisite for the deployments described below. Check installation guidelines [here](custom_scripts/k8s/operators/etcd/README.md)
+
+**Installation**
+
+External DNS services chart releases installation/upgrade (for both CoreDNS and ExternalDNS simultaneously):
+```sh
+inventory/vdmitriev-sbx.local/custom_scripts/cluster_operations.sh extdns
+```
+
+**Configuration**
+
+DNS services installation is managed via Helm charts:
+- CoreDNS:
+    - [chart](https://github.com/helm/charts/tree/master/stable/coredns)
+    - [custom values](../../inventory/vdmitriev-sbx.local/custom_scripts/k8s/helm_values/coredns/values.yaml)
+- ExternalDNS:
+    - [chart](https://github.com/helm/charts/tree/master/stable/external-dns)
+    - [custom values](../../inventory/vdmitriev-sbx.local/custom_scripts/k8s/helm_values/external-dns/values.yaml)
+
 #### glusterfs
 
 Usage options:
@@ -268,6 +296,8 @@ Usage options:
     - containers are writing to the volume directly which might end up with huge amount of files per volume and break GlusterFS sync mechanism
 
 #### metallb
+
+Kubernetes does not offer an implementation of network load-balancers (Services of type LoadBalancer) for bare metal clusters. MetalLB aims to redress this imbalance by offering a Network LB implementation that integrates with standard network equipment, so that external services on bare metal clusters also “just work” as much as possible. ((c) https://metallb.universe.tf)
 
 MetalLB installation should be managed via Helm using official Helm chart. In spite of what is written in the official MetalLB docs, Helm chart installs the latest available MetalLB.
 

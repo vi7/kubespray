@@ -18,9 +18,11 @@ metadata:
   name: test-ingress
   labels:
     app: test-container
+  annotations:
+    external-dns.alpha.kubernetes.io/target: ingress-controller.k8s-sbx.rfiserve.net
 spec:
   rules:
-  - host: test-container-app
+  - host: app.k8s-sbx.rfiserve.net
     http:
       paths:
       - backend:
