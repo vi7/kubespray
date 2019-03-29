@@ -3,6 +3,7 @@ kind: Prometheus
 metadata:
   labels:
     prometheus: sre
+    app: prometheus
   name: sre
   namespace: monitoring
 spec:
@@ -52,10 +53,11 @@ kind: Service
 metadata:
   labels:
     prometheus: sre
+    app: prometheus
   name: prometheus-sre
   namespace: monitoring
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - name: web
     port: 9090
@@ -64,3 +66,22 @@ spec:
     app: prometheus
     prometheus: sre
   sessionAffinity: ClientIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: prometheus-sre
+  namespace: monitoring
+  labels:
+    prometheus: sre
+    app: prometheus
+  annotations:
+    external-dns.alpha.kubernetes.io/target: ingress-controller.k8s-sbx.rfiserve.net
+spec:
+  rules:
+  - host: prometheus-sre.k8s-sbx.rfiserve.net
+    http:
+      paths:
+      - backend:
+          serviceName: prometheus-sre
+          servicePort: 9090
