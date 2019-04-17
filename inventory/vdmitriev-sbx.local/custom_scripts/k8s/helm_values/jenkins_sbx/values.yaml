@@ -145,6 +145,11 @@ Master:
     - greenballs:1.15
     - timestamper:1.9
     - prometheus:1.625.3
+    - thinBackup:1.9
+    - ssh-agent:1.17
+    - github:1.29.4
+    - github-api:1.95
+    - github-branch-source:2.4.5
 
   # Enable to always override the installed plugins with the values of 'Master.InstallPlugins' on upgrade or redeployment.
   # OverwritePlugins: true
