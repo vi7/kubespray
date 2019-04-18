@@ -31,6 +31,17 @@ HAPROXY_RELEASE_NAME="haproxy-ingress"
 JENKINS_CHART_VER="0.32.9"
 JENKINS_RELEASE_NAME="jenkins-sbx"
 
+####################
+# SHARED FUNCTIONS #
+####################
+
+prepare_host() {
+  export ANSIBLE_REMOTE_TMP="/tmp"
+
+  ansible-galaxy install --force -p inventory/$CLUSTER_NAME/custom_scripts/roles -r inventory/$CLUSTER_NAME/custom_scripts/requirements.yml
+  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.yml inventory/$CLUSTER_NAME/custom_scripts/prepare_host.yml -b -v
+}
+
 #############
 # FUNCTIONS #
 #############
@@ -90,12 +101,6 @@ remove_node() {
   prepare_host
   ansible-playbook -i inventory/$CLUSTER_NAME/hosts.yml remove-node.yml -b -v \
   --extra-vars "node=$1"
-}
-
-prepare_host() {
-  export ANSIBLE_REMOTE_TMP="/tmp"
-
-  ansible-playbook -i inventory/$CLUSTER_NAME/hosts.yml inventory/$CLUSTER_NAME/custom_scripts/prepare_host.yml -b -v
 }
 
 gluster_cleanup() {
