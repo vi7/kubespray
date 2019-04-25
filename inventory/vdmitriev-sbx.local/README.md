@@ -113,7 +113,7 @@ Cluster usage and management:
             ansible_user: vdmitriev
         ```
 
-    It's also recommended to not use the same hosts for master and worker nodes at the same time. That is your inventory groups `[kube-master]` and `[kube-node]` should not intersect
+    **IMPORTANT:** It's not recommended to use the same hosts for master and worker nodes at the same time. That is your inventory groups `[kube-master]` and `[kube-node]` should not intersect
 
 6. launch cluster
 
