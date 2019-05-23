@@ -1,0 +1,4 @@
+---
+- hosts: k8s-cluster:etcd:heketi-node
+  roles:
+     - ansible-role-kubespray-bootstrap
