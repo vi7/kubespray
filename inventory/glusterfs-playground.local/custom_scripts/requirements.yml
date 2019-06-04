@@ -1,4 +1,0 @@
-# Ansible roles requirements file
-- src: git@github.com:vi7/ansible-role-kubespray-bootstrap.git
-  scm: git
-  version: 0.1.0
